@@ -67,8 +67,8 @@ class LlvmConan(ConanFile):
             self.run('install_name_tool -change @executable_path/../lib/%s @rpath/%s lib/libLTO.dylib' % (self.llvm_dylib, self.llvm_dylib))
 
     def package(self):
-        self.copy('*',             src='%s/include/llvm'         %  self.install_dir,                       dst='include/llvm')
-        self.copy('*',             src='%s/include/clang'        %  self.install_dir,                       dst='include/clang')
+        self.copy('*', src='%s/include/llvm'  % self.install_dir, dst='include/llvm')
+        self.copy('*', src='%s/include/clang' % self.install_dir, dst='include/clang')
 
         self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
         self.copy('libprofile_rt.dylib', src='%s/lib' % self.install_dir, dst='lib')
