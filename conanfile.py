@@ -68,7 +68,9 @@ class LlvmConan(ConanFile):
         self.copy('*',             src='%s/include/clang'        %  self.install_dir,                       dst='include/clang')
         self.copy('*',             src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='include/sys')
 
-        self.copy(self.llvm_dylib, src='%s/lib' % self.install_dir, dst='lib')
+        self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
+        self.copy('libprofile_rt.dylib', src='%s/lib' % self.install_dir, dst='lib')
+        self.copy('libLTO.dylib',        src='%s/lib' % self.install_dir, dst='lib')
 
         # There's also a clang dylib, but we need to use symbols which the dylib doesn't reexport, so we use the static libraries.
         self.copy('libclang*.a',   src='%s/lib' % self.install_dir, dst='lib')
