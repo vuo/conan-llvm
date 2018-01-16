@@ -6,7 +6,7 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.2'
-    package_version = '1'
+    package_version = '2'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -69,11 +69,12 @@ class LlvmConan(ConanFile):
     def package(self):
         self.copy('*',             src='%s/include/llvm'         %  self.install_dir,                       dst='include/llvm')
         self.copy('*',             src='%s/include/clang'        %  self.install_dir,                       dst='include/clang')
-        self.copy('*',             src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='include/sys')
 
         self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
         self.copy('libprofile_rt.dylib', src='%s/lib' % self.install_dir, dst='lib')
         self.copy('libLTO.dylib',        src='%s/lib' % self.install_dir, dst='lib')
+        # Yes, these are include files that need to be copied to the lib folder.
+        self.copy('*',                   src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)
 
         # There's also a clang dylib, but we need to use symbols which the dylib doesn't reexport, so we use the static libraries.
         self.copy('libclang*.a',   src='%s/lib' % self.install_dir, dst='lib')
@@ -96,8 +97,4 @@ class LlvmConan(ConanFile):
             'clangParse',
             'clangSema',
             'clangSerialization',
-        ]
-        self.cpp_info.includedirs = [
-            'include',
-            'include/sys',
         ]
