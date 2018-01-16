@@ -11,6 +11,7 @@ class LlvmTestConan(ConanFile):
     def imports(self):
         self.copy('*',       src='bin', dst='bin')
         self.copy('*.dylib', src='lib', dst='lib')
+        self.copy('clang/*', src='lib', dst='lib')
 
     def test(self):
         self.run('qbs run')
