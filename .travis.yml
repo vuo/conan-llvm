@@ -1,13 +1,13 @@
 os:
     - osx
-osx_image: xcode7.3
+osx_image: xcode6.4
 
 language: cpp
 compiler:
     - clang
 
 before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && travis_wait brew install --force-bottle conan qbs ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && travis_wait brew install --force-bottle conan qbs gcc@4.9 ; fi
 
 install:
     - qbs setup-qt --detect
