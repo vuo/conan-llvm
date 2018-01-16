@@ -35,13 +35,13 @@ class LlvmConan(ConanFile):
         with tools.chdir(self.build_dir):
             autotools = AutoToolsBuildEnvironment(self)
             autotools.flags.append('-march=x86-64')
-            autotools.flags.append('-mmacosx-version-min=10.10')
+            # gcc-4.2 says `error: Unknown value '10.10' of -mmacosx-version-min`, so extend back to 10.9
+            autotools.flags.append('-mmacosx-version-min=10.9')
             autotools.cxx_flags.remove('-stdlib=libstdc++')
-            autotools.cxx_flags.append('-static-libgcc')
-            autotools.link_flags.append('-Wl,-macosx_version_min,10.10')
+            autotools.link_flags.append('-Wl,-macosx_version_min,10.9')
             env_vars = {
-                'CC' : '/usr/local/Cellar/gcc@4.9/4.9.4/bin/gcc-4.9',
-                'CXX': '/usr/local/Cellar/gcc@4.9/4.9.4/bin/g++-4.9',
+                'CC' : '/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2',
+                'CXX': '/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2',
             }
             with tools.environment_append(env_vars):
                 autotools.configure(configure_dir='../%s' % self.source_dir,
@@ -49,7 +49,7 @@ class LlvmConan(ConanFile):
                                           '--enable-shared',
                                           '--disable-static',
                                           '--enable-optimized',
-                                          '--with-optimize-option=-Os',
+                                          '--with-optimize-option=-O3',
                                           '--disable-bindings',
                                           '--enable-targets=host',
                                           '--prefix=%s/../%s' % (os.getcwd(), self.install_dir)])
@@ -60,11 +60,6 @@ class LlvmConan(ConanFile):
             self.run('install_name_tool -id @rpath/%s lib/%s' % (self.llvm_dylib, self.llvm_dylib))
             self.run('install_name_tool -id @rpath/libprofile_rt.dylib lib/libprofile_rt.dylib')
             self.run('install_name_tool -id @rpath/libLTO.dylib lib/libLTO.dylib')
-            self.run('install_name_tool -change /usr/local/opt/gcc@4.9/lib/gcc/4.9/libstdc++.6.dylib /usr/lib/libstdc++.6.dylib lib/%s' % self.llvm_dylib)
-            self.run('install_name_tool -change /usr/local/opt/gcc@4.9/lib/gcc/4.9/libstdc++.6.dylib /usr/lib/libstdc++.6.dylib lib/libLTO.dylib')
-            self.run('install_name_tool -change /usr/local/opt/gcc@4.9/lib/gcc/4.9/libstdc++.6.dylib /usr/lib/libstdc++.6.dylib lib/libprofile_rt.dylib')
-            self.run('install_name_tool -change /usr/local/opt/gcc@4.9/lib/gcc/4.9/libstdc++.6.dylib /usr/lib/libstdc++.6.dylib bin/clang')
-            self.run('install_name_tool -change /usr/local/opt/gcc@4.9/lib/gcc/4.9/libstdc++.6.dylib /usr/lib/libstdc++.6.dylib bin/llvm-link')
             self.run('install_name_tool -change @executable_path/../lib/%s @rpath/%s lib/libLTO.dylib' % (self.llvm_dylib, self.llvm_dylib))
 
     def package(self):
