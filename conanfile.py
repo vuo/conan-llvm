@@ -62,13 +62,18 @@ class LlvmConan(ConanFile):
                     autotools.make(args=['install'])
         with tools.chdir(self.install_dir):
             self.run('install_name_tool -id @rpath/%s lib/%s' % (self.llvm_dylib, self.llvm_dylib))
+            self.run('install_name_tool -id @rpath/libprofile_rt.dylib lib/libprofile_rt.dylib')
+            self.run('install_name_tool -id @rpath/libLTO.dylib lib/libLTO.dylib')
+            self.run('install_name_tool -change @rpath/%s lib/libLTO.dylib' % self.llvm_dylib)
 
     def package(self):
         self.copy('*',             src='%s/include/llvm'         %  self.install_dir,                       dst='include/llvm')
         self.copy('*',             src='%s/include/clang'        %  self.install_dir,                       dst='include/clang')
         self.copy('*',             src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='include/sys')
 
-        self.copy(self.llvm_dylib, src='%s/lib' % self.install_dir, dst='lib')
+        self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
+        self.copy('libprofile_rt.dylib', src='%s/lib' % self.install_dir, dst='lib')
+        self.copy('libLTO.dylib',        src='%s/lib' % self.install_dir, dst='lib')
 
         # There's also a clang dylib, but we need to use symbols which the dylib doesn't reexport, so we use the static libraries.
         self.copy('libclang*.a',   src='%s/lib' % self.install_dir, dst='lib')
