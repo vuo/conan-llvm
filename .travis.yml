@@ -7,7 +7,7 @@ compiler:
     - clang
 
 before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && travis_wait brew install --force-bottle conan qbs gcc@4.9 ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && travis_wait brew install --force-bottle conan qbs && travis_wait brew upgrade gcc@4.9 ; fi
 
 install:
     - qbs setup-qt --detect
