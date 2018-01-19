@@ -7,7 +7,15 @@ compiler:
     - clang
 
 before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && travis_wait brew install --force-bottle conan qbs apple-gcc42 ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+             brew update
+          && travis_wait brew install --force-bottle conan qbs
+          && cd $(mktemp -d)
+          && /usr/bin/curl -OL https://web.archive.org/web/20130512150329/https://r.research.att.com/tools/gcc-42-5666.3-darwin11.pkg
+          && /usr/bin/xar -x -f gcc-42-5666.3-darwin11.pkg
+          && /bin/pax -rz -f usr.pkg/Payload
+          && mv usr /usr/local/Cellar/apple-gcc42/4.2.1-5666.3
+      ; fi
 
 install:
     - qbs setup-qt --detect
