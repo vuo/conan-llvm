@@ -10,12 +10,14 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              brew update
           && travis_wait brew install --force-bottle conan qbs
+          && pushd .
           && cd $(mktemp -d -t apple-gcc42)
           && /usr/bin/curl -OL https://web.archive.org/web/20130512150329/https://r.research.att.com/tools/gcc-42-5666.3-darwin11.pkg
           && /usr/bin/xar -x -f gcc-42-5666.3-darwin11.pkg
           && /bin/pax -rz -f usr.pkg/Payload
           && mkdir -p /usr/local/Cellar/apple-gcc42
           && mv usr /usr/local/Cellar/apple-gcc42/4.2.1-5666.3
+          && popd
       ; fi
 
 install:
