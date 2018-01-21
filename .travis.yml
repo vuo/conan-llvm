@@ -18,8 +18,7 @@ before_install:
           && mkdir -p /usr/local/Cellar/apple-gcc42
           && mv usr /usr/local/Cellar/apple-gcc42/4.2.1-5666.3
           && popd
-          && ls -l /usr/lib/libgcc*
-          && sudo ln -s libgcc_s.10.5.dylib /usr/lib/libgcc_s.10.4.dylib
+          && sudo ln -s libSystem.B.dylib /usr/lib/libgcc_s.10.4.dylib
       ; fi
 
 install:
