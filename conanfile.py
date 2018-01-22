@@ -5,13 +5,13 @@ import os
 class LlvmConan(ConanFile):
     name = 'llvm'
 
-    source_version = '3.2'
-    package_version = '2'
+    source_version = '3.3'
+    package_version = '1'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://github.com/vuo/conan-llvm'
-    license = 'http://releases.llvm.org/3.2/LICENSE.TXT'
+    license = 'http://releases.llvm.org/%s/LICENSE.TXT' % source_version
     description = 'A collection of modular and reusable compiler and toolchain technologies'
     source_dir  = 'llvm-%s.src' % source_version
     build_dir = '_build'
@@ -21,15 +21,11 @@ class LlvmConan(ConanFile):
 
     def source(self):
         tools.get('http://llvm.org/releases/%s/llvm-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='125090c4d26740f1d5e9838477c931ed7d9ad70d599ba265f46f3a42cb066343')
-        tools.get('http://llvm.org/releases/%s/clang-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='2aaaf03f7c0f6b16fe97ecc81247dc2bf2d4bec7620a77cc74670b7e07ff5658')
-        shutil.move('clang-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
+                  sha256='68766b1e70d05a25e2f502e997a3cb3937187a3296595cf6e0977d5cd6727578')
+        tools.get('http://llvm.org/releases/%s/cfe-%s.src.tar.gz' % (self.source_version, self.source_version),
+                  sha256='b1b55de4ab3a57d3e0331a83e0284610191c77d924e3446498d9113d08dfb996')
+        shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
 
-        tools.download('https://b33p.net/sites/default/files/llvm-disable-unused-intrinsics_1.patch', 'llvm-disable-unused-intrinsics_1.patch')
-        tools.check_sha256('llvm-disable-unused-intrinsics_1.patch', 'f5a5f89e3eb4160a43f224451473d21dc542eb89f6b541b7c6f8b29dca23156d')
-        tools.patch(patch_file='llvm-disable-unused-intrinsics_1.patch', base_path=self.source_dir)
-            
     def build(self):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
@@ -37,21 +33,23 @@ class LlvmConan(ConanFile):
             autotools.flags.append('-march=x86-64')
             # gcc-4.2 says `error: Unknown value '10.10' of -mmacosx-version-min`, so extend back to 10.9
             autotools.flags.append('-mmacosx-version-min=10.9')
-            autotools.cxx_flags.remove('-stdlib=libstdc++')
             autotools.link_flags.append('-Wl,-macosx_version_min,10.9')
             env_vars = {
-                'CC' : '/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2',
-                'CXX': '/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2',
+                'CC' : '/usr/bin/clang',
+                'CXX': '/usr/bin/clang++',
             }
             with tools.environment_append(env_vars):
                 autotools.configure(configure_dir='../%s' % self.source_dir,
                                     args=['--quiet',
                                           '--enable-shared',
-                                          '--disable-static',
+                                          '--disable-static'
+                                          '--enable-cxx11',
+                                          '--disable-jit',
+                                          '--disable-docs',
                                           '--enable-optimized',
                                           '--with-optimize-option=-O3',
                                           '--disable-bindings',
-                                          '--enable-targets=host',
+                                          '--enable-targets=x86_64',
                                           '--prefix=%s/../%s' % (os.getcwd(), self.install_dir)])
                 autotools.make(args=['install'])
                 with tools.chdir('tools/clang'):
