@@ -18,6 +18,7 @@ class LlvmConan(ConanFile):
     install_dir = '_install'
     llvm_dylib_base = 'LLVM-%s' % source_version
     llvm_dylib = 'lib%s.dylib' % llvm_dylib_base
+    exports_sources = '*.patch'
 
     def source(self):
         tools.get('http://llvm.org/releases/%s/llvm-%s.src.tar.gz' % (self.source_version, self.source_version),
@@ -25,6 +26,9 @@ class LlvmConan(ConanFile):
         tools.get('http://llvm.org/releases/%s/cfe-%s.src.tar.gz' % (self.source_version, self.source_version),
                   sha256='b1b55de4ab3a57d3e0331a83e0284610191c77d924e3446498d9113d08dfb996')
         shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
+
+        # https://b33p.net/kosada/node/7848#comment-32297
+        tools.patch(patch_file='disable-unused-intrinsics.patch', base_path=self.source_dir)
 
     def build(self):
         tools.mkdir(self.build_dir)
