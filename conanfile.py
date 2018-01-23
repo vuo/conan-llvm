@@ -62,6 +62,7 @@ class LlvmConan(ConanFile):
 
     def package(self):
         self.copy('*', src='%s/include/llvm'  % self.install_dir, dst='include/llvm')
+        self.copy('*', src='%s/include/llvm-c'% self.install_dir, dst='include/llvm-c')
         self.copy('*', src='%s/include/clang' % self.install_dir, dst='include/clang')
 
         self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
