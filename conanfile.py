@@ -16,7 +16,7 @@ class LlvmConan(ConanFile):
     source_dir  = 'llvm-%s.src' % source_version
     build_dir = '_build'
     install_dir = '_install'
-    llvm_dylib_base = 'LLVM-%ssvn' % source_version
+    llvm_dylib_base = 'LLVM-%s' % source_version
     llvm_dylib = 'lib%s.dylib' % llvm_dylib_base
 
     def source(self):
