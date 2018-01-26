@@ -5,7 +5,8 @@ import os
 class LlvmConan(ConanFile):
     name = 'llvm'
 
-    source_version = '3.3'
+    source_version = '3.4.2'
+    source_version_major_minor = '3.4'
     package_version = '1'
     version = '%s-%s' % (source_version, package_version)
 
@@ -16,15 +17,15 @@ class LlvmConan(ConanFile):
     source_dir  = 'llvm-%s.src' % source_version
     build_dir = '_build'
     install_dir = '_install'
-    llvm_dylib_base = 'LLVM-%s' % source_version
+    llvm_dylib_base = 'LLVM-%s' % source_version_major_minor
     llvm_dylib = 'lib%s.dylib' % llvm_dylib_base
     exports_sources = '*.patch'
 
     def source(self):
         tools.get('http://llvm.org/releases/%s/llvm-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='68766b1e70d05a25e2f502e997a3cb3937187a3296595cf6e0977d5cd6727578')
+                  sha256='17038d47069ad0700c063caed76f0c7259628b0e79651ce2b540d506f2f1efd7')
         tools.get('http://llvm.org/releases/%s/cfe-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='b1b55de4ab3a57d3e0331a83e0284610191c77d924e3446498d9113d08dfb996')
+                  sha256='5ba6f5772f8d00f445209356a7daf83c5bca2da5acd10de517ad2359ae95bc10')
         shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
 
         # https://b33p.net/kosada/node/7848#comment-32297
@@ -60,7 +61,6 @@ class LlvmConan(ConanFile):
                     autotools.make(args=['install'])
         with tools.chdir(self.install_dir):
             self.run('install_name_tool -id @rpath/%s lib/%s' % (self.llvm_dylib, self.llvm_dylib))
-            self.run('install_name_tool -id @rpath/libprofile_rt.dylib lib/libprofile_rt.dylib')
             self.run('install_name_tool -id @rpath/libLTO.dylib lib/libLTO.dylib')
             self.run('install_name_tool -change @executable_path/../lib/%s @rpath/%s lib/libLTO.dylib' % (self.llvm_dylib, self.llvm_dylib))
 
@@ -70,7 +70,6 @@ class LlvmConan(ConanFile):
         self.copy('*', src='%s/include/clang' % self.install_dir, dst='include/clang')
 
         self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
-        self.copy('libprofile_rt.dylib', src='%s/lib' % self.install_dir, dst='lib')
         self.copy('libLTO.dylib',        src='%s/lib' % self.install_dir, dst='lib')
         # Yes, these are include files that need to be copied to the lib folder.
         self.copy('*',                   src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)

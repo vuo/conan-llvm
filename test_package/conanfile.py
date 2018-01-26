@@ -21,6 +21,6 @@ class LlvmTestConan(ConanFile):
             'bin/clang',
             'bin/clang++',
             'bin/llvm-link',
-            'lib/libLLVM-3.3.dylib',
+            'lib/libLLVM-3.4.dylib',
         ]:
             self.run('! (otool -L ' + f + ' | tail +3 | egrep -v "^\s*(/usr/lib/|/System/)")')
