@@ -6,7 +6,7 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.3'
-    package_version = '1'
+    package_version = '2'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
