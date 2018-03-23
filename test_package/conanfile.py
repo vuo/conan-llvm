@@ -24,3 +24,4 @@ class LlvmTestConan(ConanFile):
             'lib/libLLVM-3.3.dylib',
         ]:
             self.run('! (otool -L ' + f + ' | tail +3 | egrep -v "^\s*(/usr/lib/|/System/)")')
+            self.run('! (otool -l ' + f + ' | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path/")')
