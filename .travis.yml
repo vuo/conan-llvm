@@ -1,22 +1,38 @@
-os:
-    - osx
-osx_image: xcode6.4
-
-language: cpp
-compiler:
-    - clang
+matrix:
+    include:
+        - os: osx
+          osx_image: xcode6.4
+          language: cpp
+          compiler:
+              - clang
+        - os: linux
+          dist: trusty
+          sudo: false
+          language: python
+          python: "3.6"
+          addons:
+              apt:
+                  sources:
+                      - llvm-toolchain-trusty-5.0
+                  packages:
+                      - clang-5.0
+                      - qbs
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              brew update
           && travis_wait brew install --force-bottle conan qbs
           && sudo ln -s libSystem.B.dylib /usr/lib/libgcc_s.10.4.dylib
+          && conan config install https://vuo.org/sites/default/files/conan-macos.zip
+      ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+             pip install conan
+          && conan config install https://vuo.org/sites/default/files/conan-linux.zip
       ; fi
 
 install:
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
-    - conan config install https://vuo.org/sites/default/files/conan-macos.zip
     - conan user
 
 script:

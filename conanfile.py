@@ -1,6 +1,7 @@
 from conans import ConanFile, tools, AutoToolsBuildEnvironment
 import shutil
 import os
+import platform
 
 class LlvmConan(ConanFile):
     name = 'llvm'
@@ -17,8 +18,14 @@ class LlvmConan(ConanFile):
     build_dir = '_build'
     install_dir = '_install'
     llvm_dylib_base = 'LLVM-%s' % source_version
-    llvm_dylib = 'lib%s.dylib' % llvm_dylib_base
     exports_sources = '*.patch'
+    libs = (llvm_dylib_base, 'profile_rt', 'LTO')
+
+    def requirements(self):
+        if platform.system() == 'Linux':
+            self.requires('patchelf/0.9@vuo/stable')
+        elif platform.system() != 'Darwin':
+            raise Exception('Unknown platform "%s"' % platform.system())
 
     def source(self):
         tools.get('http://llvm.org/releases/%s/llvm-%s.src.tar.gz' % (self.source_version, self.source_version),
@@ -35,13 +42,21 @@ class LlvmConan(ConanFile):
         with tools.chdir(self.build_dir):
             autotools = AutoToolsBuildEnvironment(self)
             autotools.flags.append('-march=x86-64')
-            # gcc-4.2 says `error: Unknown value '10.10' of -mmacosx-version-min`, so extend back to 10.9
-            autotools.flags.append('-mmacosx-version-min=10.9')
-            autotools.link_flags.append('-Wl,-macosx_version_min,10.9')
-            env_vars = {
-                'CC' : '/usr/bin/clang',
-                'CXX': '/usr/bin/clang++',
-            }
+
+            if platform.system() == 'Darwin':
+                # gcc-4.2 says `error: Unknown value '10.10' of -mmacosx-version-min`, so extend back to 10.9
+                autotools.flags.append('-mmacosx-version-min=10.9')
+                autotools.link_flags.append('-Wl,-macosx_version_min,10.9')
+                env_vars = {
+                    'CC' : '/usr/bin/clang',
+                    'CXX': '/usr/bin/clang++',
+                }
+            elif platform.system() == 'Linux':
+                env_vars = {
+                    'CC' : '/usr/bin/clang-5.0',
+                    'CXX': '/usr/bin/clang++-5.0',
+                }
+
             with tools.environment_append(env_vars):
                 autotools.configure(configure_dir='../%s' % self.source_dir,
                                     args=['--quiet',
@@ -59,21 +74,30 @@ class LlvmConan(ConanFile):
                 with tools.chdir('tools/clang'):
                     autotools.make(args=['install'])
         with tools.chdir(self.install_dir):
-            self.run('install_name_tool -id @rpath/%s lib/%s' % (self.llvm_dylib, self.llvm_dylib))
-            self.run('install_name_tool -id @rpath/libprofile_rt.dylib lib/libprofile_rt.dylib')
-            self.run('install_name_tool -id @rpath/libLTO.dylib lib/libLTO.dylib')
-            self.run('install_name_tool -change @executable_path/../lib/%s @rpath/%s lib/libLTO.dylib' % (self.llvm_dylib, self.llvm_dylib))
+            if platform.system() == 'Darwin':
+                for f in self.libs:
+                    self.run('install_name_tool -id @rpath/lib%s.dylib lib/lib%s.dylib' % (f, f))
+                self.run('install_name_tool -change @executable_path/../lib/lib%s.dylib @rpath/lib%s.dylib lib/libLTO.dylib' % (self.llvm_dylib_base, self.llvm_dylib_base))
+            elif platform.system() == 'Linux':
+                patchelf = deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
+                for f in self.libs:
+                    self.run('%s -id --set-soname lib%s.so lib/lib%s.so' % (f, f))
+                self.run('%s --remove-rpath lib%s.so' % (patchelf, library))
 
     def package(self):
+        if platform.system() == 'Darwin':
+            libext = 'dylib'
+        elif platform.system() == 'Linux':
+            libext = 'so'
+
         self.copy('*', src='%s/include/llvm'  % self.install_dir, dst='include/llvm')
         self.copy('*', src='%s/include/llvm-c'% self.install_dir, dst='include/llvm-c')
         self.copy('*', src='%s/include/clang' % self.install_dir, dst='include/clang')
 
-        self.copy(self.llvm_dylib,       src='%s/lib' % self.install_dir, dst='lib')
-        self.copy('libprofile_rt.dylib', src='%s/lib' % self.install_dir, dst='lib')
-        self.copy('libLTO.dylib',        src='%s/lib' % self.install_dir, dst='lib')
+        for f in self.libs:
+            self.copy('lib%s.%s' % (f, libext), src='%s/lib' % self.install_dir, dst='lib')
         # Yes, these are include files that need to be copied to the lib folder.
-        self.copy('*',                   src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)
+        self.copy('*', src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)
 
         # There's also a clang dylib, but we need to use symbols which the dylib doesn't reexport, so we use the static libraries.
         self.copy('libclang*.a',   src='%s/lib' % self.install_dir, dst='lib')
