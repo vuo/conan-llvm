@@ -14,10 +14,10 @@ matrix:
               apt:
                   sources:
                       - llvm-toolchain-trusty-5.0
-                      - sourceline: 'ppa:beineri/opt-qt-5.10.1-trusty'
+                      - sourceline: 'ppa:beineri/opt-qt594-trusty'
                   packages:
                       - clang-5.0
-                      - qt510-meta-full
+                      - qt59qbs
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -32,8 +32,9 @@ before_install:
       ; fi
 
 install:
-    - ls -l /opt/qt510/bin
-    - . /opt/qt510/bin/qt510-env.sh
+    - ls -l /opt
+    - ls -l /opt/qt59/bin
+    - . /opt/qt59/bin/qt59-env.sh
     - apt-cache search .
     - qbs --version
     - qbs setup-qt --detect
