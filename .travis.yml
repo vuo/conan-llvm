@@ -29,10 +29,10 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
              pip install conan
           && conan config install https://vuo.org/sites/default/files/conan-linux.zip
+          && . /opt/qt59/bin/qt59-env.sh
       ; fi
 
 install:
-    - . /opt/qt59/bin/qt59-env.sh
     - qbs --version
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
