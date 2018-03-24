@@ -34,6 +34,7 @@ before_install:
 install:
     - ls -l /opt/qt510/bin
     - . /opt/qt510/bin/qt510-env.sh
+    - apt-cache search .
     - qbs --version
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
