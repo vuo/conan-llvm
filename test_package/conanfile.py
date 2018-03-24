@@ -24,7 +24,7 @@ class LlvmTestConan(ConanFile):
         elif platform.system() == 'Linux':
             libext = 'so'
 
-        self.run('qbs run')
+        self.run('qbs run -f "%s"' % self.source_folder)
 
         # Ensure we only link to system libraries.
         for f in [
@@ -33,8 +33,9 @@ class LlvmTestConan(ConanFile):
             'bin/llvm-link',
             'lib/libLLVM-3.3.%s' % libext,
         ]:
+            self.output.info('Checking %s…' % f)
             if platform.system() == 'Darwin':
                 self.run('! (otool -L ' + f + ' | tail +3 | egrep -v "^\s*(/usr/lib/|/System/)")')
                 self.run('! (otool -l ' + f + ' | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path/")')
             elif platform.system() == 'Linux':
-                self.run('! (ldd ' + f + ' | grep -v "^lib/" | grep "/" | egrep -v "\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)")')
+                self.run('! (ldd ' + f + ' | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")')
