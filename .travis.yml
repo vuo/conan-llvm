@@ -37,7 +37,7 @@ install:
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-             qbs config defaultProfile qt-5-9-4
+             qbs config defaultProfile clang
       ; fi
     - conan user
 
