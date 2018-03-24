@@ -76,6 +76,7 @@ class LlvmConan(ConanFile):
                 autotools.make(args=['install'])
                 with tools.chdir('tools/clang'):
                     autotools.make(args=['install'])
+                    self.output.info('finished install')
         with tools.chdir(self.install_dir):
             if platform.system() == 'Darwin':
                 for f in self.libs:
@@ -83,7 +84,9 @@ class LlvmConan(ConanFile):
                 self.run('install_name_tool -change @executable_path/../lib/lib%s.dylib @rpath/lib%s.dylib lib/libLTO.dylib' % (self.llvm_dylib_base, self.llvm_dylib_base))
             elif platform.system() == 'Linux':
                 patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
+                self.run('pwd ; ls -lR')
                 for f in self.libs:
+                    self.output.info('patchelf %s' % f)
                     self.run('%s -id --set-soname lib%s.so lib/lib%s.so' % (patchelf, f, f))
 
     def package(self):
