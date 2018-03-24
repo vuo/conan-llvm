@@ -84,7 +84,6 @@ class LlvmConan(ConanFile):
             elif platform.system() == 'Linux':
                 patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
                 for f in self.libs:
-                    self.output.info('patchelf %s' % f)
                     self.run('%s --set-soname lib%s.so lib/lib%s.so' % (patchelf, f, f))
 
     def package(self):
