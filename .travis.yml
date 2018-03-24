@@ -1,10 +1,10 @@
 matrix:
     include:
-        - os: osx
-          osx_image: xcode6.4
-          language: cpp
-          compiler:
-              - clang
+        # - os: osx
+        #   osx_image: xcode6.4
+        #   language: cpp
+        #   compiler:
+        #       - clang
         - os: linux
           dist: trusty
           sudo: false
@@ -14,9 +14,10 @@ matrix:
               apt:
                   sources:
                       - llvm-toolchain-trusty-5.0
+                      - sourceline: 'ppa:beineri/opt-qt-5.10.1-trusty'
                   packages:
                       - clang-5.0
-                      - qbs
+                      - qt510qbs
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -31,6 +32,9 @@ before_install:
       ; fi
 
 install:
+    - ls -l /opt/qt510/bin
+    - . /opt/qt510/bin/qt510-env.sh
+    - qbs --version
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
     - conan user
