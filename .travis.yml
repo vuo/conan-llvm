@@ -32,10 +32,7 @@ before_install:
       ; fi
 
 install:
-    - ls -l /opt
-    - ls -l /opt/qt59/bin
     - . /opt/qt59/bin/qt59-env.sh
-    - apt-cache search .
     - qbs --version
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
