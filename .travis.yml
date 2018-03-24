@@ -17,7 +17,7 @@ matrix:
                       - sourceline: 'ppa:beineri/opt-qt-5.10.1-trusty'
                   packages:
                       - clang-5.0
-                      - qt510qbs
+                      - qt510-meta-full
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
