@@ -79,10 +79,9 @@ class LlvmConan(ConanFile):
                     self.run('install_name_tool -id @rpath/lib%s.dylib lib/lib%s.dylib' % (f, f))
                 self.run('install_name_tool -change @executable_path/../lib/lib%s.dylib @rpath/lib%s.dylib lib/libLTO.dylib' % (self.llvm_dylib_base, self.llvm_dylib_base))
             elif platform.system() == 'Linux':
-                patchelf = deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
+                patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
                 for f in self.libs:
-                    self.run('%s -id --set-soname lib%s.so lib/lib%s.so' % (f, f))
-                self.run('%s --remove-rpath lib%s.so' % (patchelf, library))
+                    self.run('%s -id --set-soname lib%s.so lib/lib%s.so' % (patchelf, f, f))
 
     def package(self):
         if platform.system() == 'Darwin':
