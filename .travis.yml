@@ -1,10 +1,10 @@
 matrix:
     include:
-        # - os: osx
-        #   osx_image: xcode6.4
-        #   language: cpp
-        #   compiler:
-        #       - clang
+        - os: osx
+          osx_image: xcode6.4
+          language: cpp
+          compiler:
+              - clang
         - os: linux
           dist: trusty
           sudo: false
