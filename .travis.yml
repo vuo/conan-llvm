@@ -32,8 +32,6 @@ before_install:
       ; fi
 
 install:
-    - which -a python
-    - which -a python2
     - . /opt/qt59/bin/qt59-env.sh
     - qbs --version
     - qbs setup-qt --detect
