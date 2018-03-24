@@ -58,18 +58,21 @@ class LlvmConan(ConanFile):
                 }
 
             with tools.environment_append(env_vars):
-                autotools.configure(configure_dir='../%s' % self.source_dir,
-                                    args=['--quiet',
-                                          '--enable-shared',
-                                          '--disable-static'
-                                          '--enable-cxx11',
-                                          '--disable-jit',
-                                          '--disable-docs',
-                                          '--enable-optimized',
-                                          '--with-optimize-option=-O3',
-                                          '--disable-bindings',
-                                          '--enable-targets=x86_64',
-                                          '--prefix=%s/../%s' % (os.getcwd(), self.install_dir)])
+                args = ['--quiet',
+                        '--enable-shared',
+                        '--disable-static'
+                        '--enable-cxx11',
+                        '--disable-jit',
+                        '--disable-docs',
+                        '--enable-optimized',
+                        '--with-optimize-option=-O3',
+                        '--disable-bindings',
+                        '--enable-targets=x86_64',
+                        '--prefix=%s/../%s' % (os.getcwd(), self.install_dir)]
+                if platform.system() == 'Linux':
+                    args.append('--with-python=/usr/bin/python2')
+
+                autotools.configure(configure_dir='../%s' % self.source_dir, args=args)
                 autotools.make(args=['install'])
                 with tools.chdir('tools/clang'):
                     autotools.make(args=['install'])
