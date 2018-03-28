@@ -37,6 +37,9 @@ class LlvmConan(ConanFile):
         # https://b33p.net/kosada/node/7848#comment-32297
         tools.patch(patch_file='disable-unused-intrinsics.patch', base_path=self.source_dir)
 
+        self.run('mv %s/LICENSE.TXT %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
+        self.run('mv %s/include/llvm/Support/LICENSE.TXT %s/%s-systemsupport.txt' % (self.source_dir, self.source_dir, self.name))
+
     def build(self):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
@@ -107,6 +110,9 @@ class LlvmConan(ConanFile):
         self.copy('llvm-link',     src='%s/bin' % self.install_dir, dst='bin')
         self.copy('clang',         src='%s/bin' % self.install_dir, dst='bin')
         self.copy('clang++',       src='%s/bin' % self.install_dir, dst='bin', symlinks=True)
+
+        self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
+        self.copy('%s-systemsupport.txt' % self.name, src=self.source_dir, dst='license')
 
     def package_info(self):
         self.cpp_info.libs = [
