@@ -39,6 +39,7 @@ class LlvmConan(ConanFile):
 
         self.run('mv %s/LICENSE.TXT %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/include/llvm/Support/LICENSE.TXT %s/%s-systemsupport.txt' % (self.source_dir, self.source_dir, self.name))
+        self.run('mv %s/tools/clang/LICENSE.TXT %s/clang.txt' % (self.source_dir, self.source_dir))
 
     def build(self):
         tools.mkdir(self.build_dir)
@@ -113,6 +114,7 @@ class LlvmConan(ConanFile):
 
         self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
         self.copy('%s-systemsupport.txt' % self.name, src=self.source_dir, dst='license')
+        self.copy('clang.txt', src=self.source_dir, dst='license')
 
     def package_info(self):
         self.cpp_info.libs = [
