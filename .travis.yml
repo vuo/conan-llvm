@@ -24,8 +24,6 @@ before_install:
              brew update &> /dev/null
           && travis_wait brew install --force-bottle conan qbs
           && conan config install https://vuo.org/sites/default/files/conan-macos.zip
-          && ls -l /usr/lib
-          && ls -l /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/lib
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
              pip install conan
