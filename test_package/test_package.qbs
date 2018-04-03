@@ -33,7 +33,7 @@ Project {
 			cpp.minimumMacosVersion: '10.10'
 			cpp.target: 'x86_64-apple-macosx10.10'
 			cpp.stripPath: '/usr/bin/true'
-			xcode.sdk: 'macosx10.11'
+			xcode.sdk: 'macosx10.10'
 		}
 		Properties {
 			condition: qbs.targetOS.contains('linux')
