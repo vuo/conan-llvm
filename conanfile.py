@@ -62,9 +62,9 @@ class LlvmConan(ConanFile):
                 }
 
             with tools.environment_append(env_vars):
-                args = ['--quiet',
-                        '--enable-shared',
+                args = ['--enable-shared',
                         '--disable-static'
+                        '--enable-assertions',
                         '--enable-cxx11',
                         '--disable-jit',
                         '--disable-docs',
