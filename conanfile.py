@@ -83,7 +83,6 @@ class LlvmConan(ConanFile):
         'clangStaticAnalyzerCore': 0,
         'clangStaticAnalyzerFrontend': 0,
         'clangTooling': 0,
-        'profile_rt': 0,
     }
 
     def requirements(self):
