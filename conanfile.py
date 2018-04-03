@@ -7,7 +7,7 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.3'
-    package_version = '3'
+    package_version = '2'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -52,8 +52,8 @@ class LlvmConan(ConanFile):
                 autotools.flags.append('-mmacosx-version-min=10.9')
                 autotools.link_flags.append('-Wl,-macosx_version_min,10.9')
                 env_vars = {
-                    'CC' : '/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2',
-                    'CXX': '/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2',
+                    'CC' : '/usr/bin/clang',
+                    'CXX': '/usr/bin/clang++',
                 }
             elif platform.system() == 'Linux':
                 env_vars = {
