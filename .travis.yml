@@ -23,7 +23,7 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              brew update &> /dev/null
           && travis_wait brew install --force-bottle qbs
-          && brew install ./conan.rb
+          && brew install ./conan.rb || cat /Users/travis/Library/Logs/Homebrew/conan/03.pip
           && sudo ln -s libSystem.B.dylib /usr/lib/libgcc_s.10.4.dylib
           && conan config install https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
