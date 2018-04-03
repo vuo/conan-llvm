@@ -47,6 +47,8 @@ class LlvmConan(ConanFile):
             autotools = AutoToolsBuildEnvironment(self)
             autotools.flags.append('-march=x86-64')
             autotools.cxx_flags.append('-std=c++11')
+            autotools.cxx_flags.append('-stdlib=libc++')
+            autotools.link_flags.append('-stdlib=libc++')
 
             if platform.system() == 'Darwin':
                 # gcc-4.2 says `error: Unknown value '10.10' of -mmacosx-version-min`, so extend back to 10.9
@@ -67,6 +69,7 @@ class LlvmConan(ConanFile):
                         '--disable-static',
                         '--enable-assertions',
                         '--enable-cxx11',
+                        '--enable-libcpp',
                         '--disable-jit',
                         '--disable-docs',
                         '--enable-optimized',

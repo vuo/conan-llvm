@@ -17,6 +17,10 @@ matrix:
                       - sourceline: 'ppa:beineri/opt-qt594-trusty'
                   packages:
                       - clang-5.0
+                      - libc++-dev
+                      - libc++1
+                      - libc++abi-dev
+                      - libc++abi1
                       - qt59qbs
 
 before_install:
