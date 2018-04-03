@@ -1,4 +1,4 @@
-from conans import ConanFile, tools, AutoToolsBuildEnvironment
+from conans import ConanFile, CMake, tools
 import shutil
 import os
 import platform
@@ -7,9 +7,10 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.3'
-    package_version = '3'
+    package_version = '4'
     version = '%s-%s' % (source_version, package_version)
 
+    build_requires = 'vuoutils/1.0@vuo/stable'
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://github.com/vuo/conan-llvm'
     license = 'http://releases.llvm.org/%s/LICENSE.TXT' % source_version
@@ -17,9 +18,73 @@ class LlvmConan(ConanFile):
     source_dir  = 'llvm-%s.src' % source_version
     build_dir = '_build'
     install_dir = '_install'
-    llvm_dylib_base = 'LLVM-%s' % source_version
     exports_sources = '*.patch'
-    libs = (llvm_dylib_base, 'profile_rt', 'LTO')
+    libs = {
+        'LLVMAnalysis': 0,
+        'LLVMArchive': 0,
+        'LLVMAsmParser': 0,
+        'LLVMAsmPrinter': 0,
+        'LLVMBitReader': 0,
+        'LLVMBitWriter': 0,
+        'LLVMCodeGen': 0,
+        'LLVMCore': 0,
+        'LLVMDebugInfo': 0,
+        'LLVMExecutionEngine': 0,
+        'LLVMIRReader': 0,
+        'LLVMInstCombine': 0,
+        'LLVMInstrumentation': 0,
+        'LLVMInterpreter': 0,
+        'LLVMJIT': 0,
+        'LLVMLinker': 0,
+        'LLVMMC': 0,
+        'LLVMMCDisassembler': 0,
+        'LLVMMCJIT': 0,
+        'LLVMMCParser': 0,
+        'LLVMObjCARCOpts': 0,
+        'LLVMObject': 0,
+        'LLVMOption': 0,
+        'LLVMRuntimeDyld': 0,
+        'LLVMScalarOpts': 0,
+        'LLVMSelectionDAG': 0,
+        'LLVMSupport': 0,
+        'LLVMTableGen': 0,
+        'LLVMTarget': 0,
+        'LLVMTransformUtils': 0,
+        'LLVMVectorize': 0,
+        'LLVMX86AsmParser': 0,
+        'LLVMX86AsmPrinter': 0,
+        'LLVMX86CodeGen': 0,
+        'LLVMX86Desc': 0,
+        'LLVMX86Disassembler': 0,
+        'LLVMX86Info': 0,
+        'LLVMX86Utils': 0,
+        'LLVMipa': 0,
+        'LLVMipo': 0,
+        'LTO': 0,
+        'clang': 0,
+        'clangARCMigrate': 0,
+        'clangAST': 0,
+        'clangASTMatchers': 0,
+        'clangAnalysis': 0,
+        'clangBasic': 0,
+        'clangCodeGen': 0,
+        'clangDriver': 0,
+        'clangEdit': 0,
+        'clangFormat': 0,
+        'clangFrontend': 0,
+        'clangFrontendTool': 0,
+        'clangLex': 0,
+        'clangParse': 0,
+        'clangRewriteCore': 0,
+        'clangRewriteFrontend': 0,
+        'clangSema': 0,
+        'clangSerialization': 0,
+        'clangStaticAnalyzerCheckers': 0,
+        'clangStaticAnalyzerCore': 0,
+        'clangStaticAnalyzerFrontend': 0,
+        'clangTooling': 0,
+        'profile_rt': 0,
+    }
 
     def requirements(self):
         if platform.system() == 'Linux':
@@ -30,72 +95,88 @@ class LlvmConan(ConanFile):
     def source(self):
         tools.get('http://llvm.org/releases/%s/llvm-%s.src.tar.gz' % (self.source_version, self.source_version),
                   sha256='68766b1e70d05a25e2f502e997a3cb3937187a3296595cf6e0977d5cd6727578')
+
         tools.get('http://llvm.org/releases/%s/cfe-%s.src.tar.gz' % (self.source_version, self.source_version),
                   sha256='b1b55de4ab3a57d3e0331a83e0284610191c77d924e3446498d9113d08dfb996')
         shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
 
+        tools.get('http://llvm.org/releases/%s/libcxx-%s.src.tar.gz' % (self.source_version, self.source_version),
+                  sha256='c403ed18d2992719c794cdd760dc87a948b62a7c2a07beb39eb984dfeb1679f1')
+        shutil.move('libcxx-%s.src' % self.source_version, '%s/projects/libcxx' % self.source_dir)
+
         # https://b33p.net/kosada/node/7848#comment-32297
         tools.patch(patch_file='disable-unused-intrinsics.patch', base_path=self.source_dir)
-
-        # https://bugs.llvm.org/show_bug.cgi?id=19723
-        tools.patch(patch_file='linux-cstddef.patch', base_path=self.source_dir)
 
         self.run('mv %s/LICENSE.TXT %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/include/llvm/Support/LICENSE.TXT %s/%s-systemsupport.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/tools/clang/LICENSE.TXT %s/clang.txt' % (self.source_dir, self.source_dir))
 
     def build(self):
+        import VuoUtils
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
-            autotools = AutoToolsBuildEnvironment(self)
-            autotools.flags.append('-march=x86-64')
-            autotools.cxx_flags.append('-std=c++11')
-            autotools.cxx_flags.append('-stdlib=libc++')
-            autotools.link_flags.append('-stdlib=libc++')
+            cmake = CMake(self)
+
+            cmake.definitions['CMAKE_BUILD_TYPE'] = 'Release'
+            cmake.definitions['CMAKE_C_FLAGS'] = '-O3 -march=x86-64'
+            cmake.definitions['CMAKE_CXX_FLAGS'] = cmake.definitions['CMAKE_C_FLAGS'] + ' -std=c++11 -stdlib=libc++'
+            cmake.definitions['CMAKE_SHARED_LINKER_FLAGS'] = '-stdlib=libc++'
+            cmake.definitions['CMAKE_STATIC_LINKER_FLAGS'] = '-stdlib=libc++'
+            cmake.definitions['CMAKE_INSTALL_PREFIX'] = '%s/../%s' % (os.getcwd(), self.install_dir)
+
+            cmake.definitions['BUILD_SHARED_LIBS'] = 'ON'
+            cmake.definitions['CLANG_BUILD_EXAMPLES'] = 'OFF'
+            cmake.definitions['CLANG_INCLUDE_TESTS'] = 'OFF'
+            cmake.definitions['LLVM_BUILD_32_BITS'] = 'OFF'
+            cmake.definitions['LLVM_BUILD_EXAMPLES'] = 'OFF'
+            cmake.definitions['LLVM_BUILD_RUNTIME'] = 'ON'
+            cmake.definitions['LLVM_BUILD_TESTS'] = 'OFF'
+            cmake.definitions['LLVM_BUILD_TOOLS'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_ASSERTIONS'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_BACKTRACES'] = 'OFF'
+            cmake.definitions['LLVM_ENABLE_FFI'] = 'OFF'
+            cmake.definitions['LLVM_ENABLE_PEDANTIC'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_PIC'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_THREADS'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_TIMESTAMPS'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_WARNINGS'] = 'ON'
+            cmake.definitions['LLVM_ENABLE_WERROR'] = 'OFF'
+            cmake.definitions['LLVM_EXPERIMENTAL_TARGETS_TO_BUILD'] = ''
+            cmake.definitions['LLVM_EXTERNAL_CLANG_BUILD'] = 'ON'
+            cmake.definitions['LLVM_INCLUDE_EXAMPLES'] = 'OFF'
+            cmake.definitions['LLVM_INCLUDE_RUNTIME'] = 'OFF'
+            cmake.definitions['LLVM_INCLUDE_TESTS'] = 'OFF'
+            cmake.definitions['LLVM_INCLUDE_TOOLS'] = 'ON'
+            cmake.definitions['LLVM_LIT_ARGS'] = '-sv'
+            cmake.definitions['LLVM_TARGETS_TO_BUILD'] = 'X86'
+            cmake.definitions['LLVM_TARGET_ARCH'] = 'host'
+            cmake.definitions['LLVM_USE_FOLDERS'] = 'ON'
+            cmake.definitions['LLVM_USE_INTEL_JITEVENTS'] = 'OFF'
+            cmake.definitions['LLVM_USE_OPROFILE'] = 'OFF'
 
             if platform.system() == 'Darwin':
-                # gcc-4.2 says `error: Unknown value '10.10' of -mmacosx-version-min`, so extend back to 10.9
-                autotools.flags.append('-mmacosx-version-min=10.9')
-                autotools.link_flags.append('-Wl,-macosx_version_min,10.9')
-                env_vars = {
-                    'CC' : '/usr/bin/clang',
-                    'CXX': '/usr/bin/clang++',
-                }
+                cmake.definitions['CMAKE_C_FLAGS'] += ' -mmacosx-version-min=10.10'
+                cmake.definitions['CMAKE_CXX_FLAGS'] += ' -mmacosx-version-min=10.10'
+                cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang'
+                cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++'
+                cmake.definitions['CMAKE_OSX_ARCHITECTURES'] = 'x86_64'
+                cmake.definitions['CMAKE_OSX_DEPLOYMENT_TARGET'] = '10.10'
             elif platform.system() == 'Linux':
-                env_vars = {
-                    'CC' : '/usr/bin/clang-5.0',
-                    'CXX': '/usr/bin/clang++-5.0',
-                }
+                cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang-5.0'
+                cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++-5.0'
 
-            with tools.environment_append(env_vars):
-                args = ['--enable-shared',
-                        '--disable-static',
-                        '--enable-assertions',
-                        '--enable-cxx11',
-                        '--enable-libcpp',
-                        '--disable-jit',
-                        '--disable-docs',
-                        '--enable-optimized',
-                        '--with-optimize-option=-O3',
-                        '--disable-bindings',
-                        '--enable-targets=x86_64',
-                        '--prefix=%s/../%s' % (os.getcwd(), self.install_dir)]
-                if platform.system() == 'Linux':
-                    args.append('--with-python=/usr/bin/python2')
+            cmake.configure(source_dir='../%s' % self.source_dir,
+                            build_dir='.')
+            cmake.build()
+            cmake.install()
 
-                autotools.configure(configure_dir='../%s' % self.source_dir, args=args)
-                autotools.make(args=['install'])
-                with tools.chdir('tools/clang'):
-                    autotools.make(args=['install'])
+
         with tools.chdir(self.install_dir):
-            if platform.system() == 'Darwin':
-                for f in self.libs:
-                    self.run('install_name_tool -id @rpath/lib%s.dylib lib/lib%s.dylib' % (f, f))
-                self.run('install_name_tool -change @executable_path/../lib/lib%s.dylib @rpath/lib%s.dylib lib/libLTO.dylib' % (self.llvm_dylib_base, self.llvm_dylib_base))
-            elif platform.system() == 'Linux':
-                patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
-                for f in self.libs:
-                    self.run('%s --set-soname lib%s.so lib/lib%s.so' % (patchelf, f, f))
+            with tools.chdir('lib'):
+                if platform.system() == 'Darwin':
+                    self.run('rm libclang.dylib')
+                    self.run('mv libclang.3.3.dylib libclang.dylib')
+                VuoUtils.fixLibs(self.libs, self.deps_cpp_info)
 
     def package(self):
         if platform.system() == 'Darwin':
@@ -107,13 +188,10 @@ class LlvmConan(ConanFile):
         self.copy('*', src='%s/include/llvm-c'% self.install_dir, dst='include/llvm-c')
         self.copy('*', src='%s/include/clang' % self.install_dir, dst='include/clang')
 
-        for f in self.libs:
+        for f in list(self.libs.keys()):
             self.copy('lib%s.%s' % (f, libext), src='%s/lib' % self.install_dir, dst='lib')
         # Yes, these are include files that need to be copied to the lib folder.
         self.copy('*', src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)
-
-        # There's also a clang dylib, but we need to use symbols which the dylib doesn't reexport, so we use the static libraries.
-        self.copy('libclang*.a',   src='%s/lib' % self.install_dir, dst='lib')
 
         self.copy('llvm-link',     src='%s/bin' % self.install_dir, dst='bin')
         self.copy('clang',         src='%s/bin' % self.install_dir, dst='bin')
@@ -124,17 +202,4 @@ class LlvmConan(ConanFile):
         self.copy('clang.txt', src=self.source_dir, dst='license')
 
     def package_info(self):
-        self.cpp_info.libs = [
-            self.llvm_dylib_base,
-            'clangAnalysis',
-            'clangAST',
-            'clangBasic',
-            'clangCodeGen',
-            'clangDriver',
-            'clangEdit',
-            'clangFrontend',
-            'clangLex',
-            'clangParse',
-            'clangSema',
-            'clangSerialization',
-        ]
+        self.cpp_info.libs = list(self.libs.keys())
