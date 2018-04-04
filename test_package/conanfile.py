@@ -12,7 +12,7 @@ class LlvmTestConan(ConanFile):
             raise Exception('Unknown platform "%s"' % platform.system())
 
     def build(self):
-        self.run('qbs -f "%s"' % self.source_folder)
+        self.run('qbs --command-echo-mode command-line -f "%s"' % self.source_folder)
 
     def imports(self):
         self.copy('*', src='bin', dst='bin')

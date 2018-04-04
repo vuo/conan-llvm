@@ -30,6 +30,7 @@ Project {
 		Properties {
 			condition: qbs.targetOS.contains('macos')
 			cpp.linkerWrapper: undefined
+			cpp.cxxFlags: ['-v']
 			cpp.minimumMacosVersion: '10.10'
 			cpp.target: 'x86_64-apple-macosx10.10'
 			cpp.stripPath: '/usr/bin/true'
