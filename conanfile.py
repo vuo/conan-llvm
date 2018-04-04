@@ -114,7 +114,7 @@ class LlvmConan(ConanFile):
 
         if platform.system() == 'Linux':
             tools.patch(patch_file='linux-offsetof.patch', base_path=self.source_dir)
-            tools.replace_in_file('cmake/config-ix.cmake',
+            tools.replace_in_file('%s/cmake/config-ix.cmake' % self.source_dir,
                 'check_include_file(sanitizer/msan_interface.h HAVE_SANITIZER_MSAN_INTERFACE_H)',
                 '')
 
