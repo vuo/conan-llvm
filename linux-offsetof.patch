@@ -1,0 +1,11 @@
+--- include/llvm/Support/Allocator.h.orig	2018-04-04 12:50:36.000000000 -0400
++++ include/llvm/Support/Allocator.h	2018-04-04 12:50:59.000000000 -0400
+@@ -22,6 +22,8 @@
+ #include <cstddef>
+ #include <cstdlib>
+ 
++#define offsetof(t, d) __builtin_offsetof(t, d)
++
+ namespace llvm {
+ template <typename T> struct ReferenceAdder { typedef T& result; };
+ template <typename T> struct ReferenceAdder<T&> { typedef T result; };

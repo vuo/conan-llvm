@@ -112,6 +112,9 @@ class LlvmConan(ConanFile):
         # https://b33p.net/kosada/node/7848#comment-32297
         tools.patch(patch_file='disable-unused-intrinsics.patch', base_path=self.source_dir)
 
+        if platform.system() == 'Linux':
+            tools.patch(patch_file='linux-offsetof.patch', base_path=self.source_dir)
+
         self.run('mv %s/LICENSE.TXT %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/include/llvm/Support/LICENSE.TXT %s/%s-systemsupport.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/tools/clang/LICENSE.TXT %s/clang.txt' % (self.source_dir, self.source_dir))
