@@ -170,6 +170,7 @@ class LlvmConan(ConanFile):
             elif platform.system() == 'Linux':
                 cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang-5.0'
                 cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++-5.0'
+                cmake.definitions['PYTHON_EXECUTABLE'] = '/usr/bin/python2'
 
             # Build LLVM and Clang.
             cmake.configure(source_dir='../%s' % self.source_dir,
