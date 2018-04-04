@@ -7,10 +7,10 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.3'
-    package_version = '4'
+    package_version = '5'
     version = '%s-%s' % (source_version, package_version)
 
-    build_requires = 'vuoutils/1.0@vuo/stable'
+    build_requires = 'vuoutils/1.1@vuo/stable'
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://github.com/vuo/conan-llvm'
     license = 'http://releases.llvm.org/%s/LICENSE.TXT' % source_version
@@ -61,6 +61,7 @@ class LlvmConan(ConanFile):
         'LLVMipa': 0,
         'LLVMipo': 0,
         'LTO': 0,
+        'c++': 0,
         'clang': 0,
         'clangARCMigrate': 0,
         'clangAST': 0,
@@ -84,6 +85,11 @@ class LlvmConan(ConanFile):
         'clangStaticAnalyzerFrontend': 0,
         'clangTooling': 0,
     }
+    executables = [
+        'clang',
+        'clang++',
+        'llvm-link',
+    ]
 
     def requirements(self):
         if platform.system() == 'Linux':
@@ -140,6 +146,7 @@ class LlvmConan(ConanFile):
             cmake.definitions['LLVM_ENABLE_TIMESTAMPS'] = 'ON'
             cmake.definitions['LLVM_ENABLE_WARNINGS'] = 'ON'
             cmake.definitions['LLVM_ENABLE_WERROR'] = 'OFF'
+            cmake.definitions['LLVM_ENABLE_LIBCXX'] = 'ON'
             cmake.definitions['LLVM_EXPERIMENTAL_TARGETS_TO_BUILD'] = ''
             cmake.definitions['LLVM_EXTERNAL_CLANG_BUILD'] = 'ON'
             cmake.definitions['LLVM_INCLUDE_EXAMPLES'] = 'OFF'
@@ -164,18 +171,40 @@ class LlvmConan(ConanFile):
                 cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang-5.0'
                 cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++-5.0'
 
+            # Build LLVM and Clang.
             cmake.configure(source_dir='../%s' % self.source_dir,
                             build_dir='.')
             cmake.build()
             cmake.install()
 
+            # Build libc++.
+            libcxx_build_dir = 'libcxx'
+            tools.mkdir(libcxx_build_dir)
+            with tools.chdir(libcxx_build_dir):
+                if platform.system() == 'Darwin':
+                    cmake.definitions['CMAKE_SHARED_LINKER_FLAGS'] += ' /usr/lib/libc++abi.dylib'
+                    cmake.definitions['CMAKE_STATIC_LINKER_FLAGS'] += ' /usr/lib/libc++abi.dylib'
+                cmake.configure(source_dir='../../%s/projects/libcxx' % self.source_dir,
+                                build_dir='.')
+                cmake.build()
+                cmake.install()
 
         with tools.chdir(self.install_dir):
+            with tools.chdir('bin'):
+                if platform.system() == 'Darwin':
+                    self.run('rm clang')
+                    self.run('mv clang-3.3 clang')
             with tools.chdir('lib'):
                 if platform.system() == 'Darwin':
                     self.run('rm libclang.dylib')
                     self.run('mv libclang.3.3.dylib libclang.dylib')
-                VuoUtils.fixLibs(self.libs, self.deps_cpp_info)
+                    self.run('rm libc++.dylib')
+                    self.run('mv libc++.1.0.dylib libc++.dylib')
+                self.output.info(self.libs)
+                VuoUtils.fixLibs(self.libs, self.deps_cpp_info, False)
+
+            with tools.chdir('bin'):
+                VuoUtils.fixExecutables(self.executables, self.libs, self.deps_cpp_info, False)
 
     def package(self):
         if platform.system() == 'Darwin':
@@ -183,18 +212,15 @@ class LlvmConan(ConanFile):
         elif platform.system() == 'Linux':
             libext = 'so'
 
-        self.copy('*', src='%s/include/llvm'  % self.install_dir, dst='include/llvm')
-        self.copy('*', src='%s/include/llvm-c'% self.install_dir, dst='include/llvm-c')
-        self.copy('*', src='%s/include/clang' % self.install_dir, dst='include/clang')
+        self.copy('*', src='%s/include'  % self.install_dir, dst='include')
 
         for f in list(self.libs.keys()):
             self.copy('lib%s.%s' % (f, libext), src='%s/lib' % self.install_dir, dst='lib')
         # Yes, these are include files that need to be copied to the lib folder.
         self.copy('*', src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)
 
-        self.copy('llvm-link',     src='%s/bin' % self.install_dir, dst='bin')
-        self.copy('clang',         src='%s/bin' % self.install_dir, dst='bin')
-        self.copy('clang++',       src='%s/bin' % self.install_dir, dst='bin', symlinks=True)
+        for f in self.executables:
+            self.copy(f, src='%s/bin' % self.install_dir, dst='bin', symlinks=True)
 
         self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
         self.copy('%s-systemsupport.txt' % self.name, src=self.source_dir, dst='license')
@@ -202,3 +228,7 @@ class LlvmConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = list(self.libs.keys())
+        if platform.system() == 'Darwin':
+            self.cpp_info.libs += ['/usr/lib/libc++abi.dylib']
+
+        self.cpp_info.includedirs = ['include', 'include/c++/v1/']
