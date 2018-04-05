@@ -197,6 +197,7 @@ class LlvmConan(ConanFile):
                 cmake.install()
 
         with tools.chdir(self.install_dir):
+            self.output.info('before:')
             self.run('ls -lR')
             with tools.chdir('bin'):
                 self.run('rm clang')
@@ -207,10 +208,24 @@ class LlvmConan(ConanFile):
                     self.run('mv libclang.3.3.dylib libclang.dylib')
                     self.run('rm libc++.dylib')
                     self.run('mv libc++.1.0.dylib libc++.dylib')
+                elif platform.system() == 'Linux':
+                    self.run('rm libclang.so')
+                    self.run('mv libclang.so.3.3 libclang.so')
+                    self.run('rm libc++.so')
+                    self.run('mv libc++.so.1.0 libc++.so')
                 VuoUtils.fixLibs(self.libs, self.deps_cpp_info, False)
 
             with tools.chdir('bin'):
                 VuoUtils.fixExecutables(self.executables, self.libs, self.deps_cpp_info, False)
+
+            self.output.info('after:')
+            self.run('ls -lR')
+            if platform.system() == 'Linux':
+                self.output.info('ldd bin/clang:')
+                self.run('ldd bin/clang')
+                patchelf = deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
+                self.output.info('patchelf --print-rpath bin/clang:')
+                self.run('%s --print-rpath bin/clang' % patchelf)
 
     def package(self):
         if platform.system() == 'Darwin':
