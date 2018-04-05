@@ -223,7 +223,7 @@ class LlvmConan(ConanFile):
             if platform.system() == 'Linux':
                 self.output.info('ldd bin/clang:')
                 self.run('ldd bin/clang')
-                patchelf = deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
+                patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
                 self.output.info('patchelf --print-rpath bin/clang:')
                 self.run('%s --print-rpath bin/clang' % patchelf)
 
