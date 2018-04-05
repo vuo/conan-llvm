@@ -197,17 +197,16 @@ class LlvmConan(ConanFile):
                 cmake.install()
 
         with tools.chdir(self.install_dir):
+            self.run('ls -lR')
             with tools.chdir('bin'):
-                if platform.system() == 'Darwin':
-                    self.run('rm clang')
-                    self.run('mv clang-3.3 clang')
+                self.run('rm clang')
+                self.run('mv clang-3.3 clang')
             with tools.chdir('lib'):
                 if platform.system() == 'Darwin':
                     self.run('rm libclang.dylib')
                     self.run('mv libclang.3.3.dylib libclang.dylib')
                     self.run('rm libc++.dylib')
                     self.run('mv libc++.1.0.dylib libc++.dylib')
-                self.output.info(self.libs)
                 VuoUtils.fixLibs(self.libs, self.deps_cpp_info, False)
 
             with tools.chdir('bin'):
