@@ -46,4 +46,4 @@ install:
 
 script:
     - conan create . vuo/stable
-      && conan upload --remote vuo --all --confirm llvm/*
+      && travis_wait conan upload --remote vuo --all --confirm llvm/*
