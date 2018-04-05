@@ -221,13 +221,15 @@ class LlvmConan(ConanFile):
             self.output.info('after:')
             self.run('ls -lR')
             if platform.system() == 'Linux':
-                self.output.info('ldd bin/clang:')
-                self.run('ldd bin/clang')
                 patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
-                self.output.info('patchelf --print-rpath bin/clang:')
-                self.run('%s --print-rpath bin/clang' % patchelf)
                 self.run('%s --set-rpath "\$ORIGIN/../lib" bin/clang' % patchelf)
-                self.run('%s --print-rpath bin/clang' % patchelf)
+
+                self.output.info('ldd bin/llvm-link:')
+                self.run('ldd bin/llvm-link')
+                self.output.info('patchelf --print-rpath bin/llvm-link:')
+                self.run('%s --print-rpath bin/llvm-link' % patchelf)
+                self.run('%s --set-rpath "\$ORIGIN/../lib" bin/llvm-link' % patchelf)
+                self.run('%s --print-rpath bin/llvm-link' % patchelf)
 
     def package(self):
         if platform.system() == 'Darwin':
