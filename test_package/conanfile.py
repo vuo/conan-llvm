@@ -40,7 +40,7 @@ class LlvmTestConan(ConanFile):
                 self.run('! (ldd ' + f + ' | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")')
 
         libs = self.deps_cpp_info['llvm'].libs
-        libs.remove('/usr/lib/libc++abi.dylib')
+        libs.remove('c++abi')
         for f in libs:
             self.output.info('Checking %s...' % f)
             if platform.system() == 'Darwin':
