@@ -236,6 +236,5 @@ class LlvmConan(ConanFile):
         self.cpp_info.libs = list(self.libs.keys())
         if platform.system() == 'Darwin':
             self.cpp_info.libs += ['c++abi']
-            self.cpp_info.sharedlinkflags = ['-L/usr/lib']
 
         self.cpp_info.includedirs = ['include', 'include/c++/v1/']

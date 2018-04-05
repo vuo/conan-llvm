@@ -30,8 +30,6 @@ Project {
 		Properties {
 			condition: qbs.targetOS.contains('macos')
 			cpp.linkerWrapper: undefined
-			cpp.cxxFlags: ['-v']
-			cpp.linkerFlags: ['-syslibroot', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk']
 			cpp.minimumMacosVersion: '10.10'
 			cpp.target: 'x86_64-apple-macosx10.10'
 			cpp.stripPath: '/usr/bin/true'
