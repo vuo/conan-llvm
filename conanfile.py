@@ -226,6 +226,8 @@ class LlvmConan(ConanFile):
                 patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
                 self.output.info('patchelf --print-rpath bin/clang:')
                 self.run('%s --print-rpath bin/clang' % patchelf)
+                self.run('%s --set-rpath "\$ORIGIN/../lib" bin/clang' % patchelf)
+                self.run('%s --print-rpath bin/clang' % patchelf)
 
     def package(self):
         if platform.system() == 'Darwin':
