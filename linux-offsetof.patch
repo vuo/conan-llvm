@@ -9,3 +9,14 @@
  namespace llvm {
  template <typename T> struct ReferenceAdder { typedef T& result; };
  template <typename T> struct ReferenceAdder<T&> { typedef T result; };
+--- tools/clang/lib/Rewrite/Core/RewriteRope.cpp.orig	2018-04-04 21:01:57.000000000 -0400
++++ tools/clang/lib/Rewrite/Core/RewriteRope.cpp	2018-04-04 21:02:57.000000000 -0400
+@@ -792,7 +792,7 @@ RopePiece RewriteRope::MakeRopeString(co
+   if (AllocBuffer && --AllocBuffer->RefCount == 0)
+     delete [] (char*)AllocBuffer;
+ 
+-  unsigned AllocSize = offsetof(RopeRefCountString, Data) + AllocChunkSize;
++  unsigned AllocSize = __builtin_offsetof(RopeRefCountString, Data) + AllocChunkSize;
+   AllocBuffer = reinterpret_cast<RopeRefCountString *>(new char[AllocSize]);
+   AllocBuffer->RefCount = 0;
+   memcpy(AllocBuffer->Data, Start, Len);
