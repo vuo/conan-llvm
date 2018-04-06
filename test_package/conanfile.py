@@ -6,7 +6,7 @@ class LlvmTestConan(ConanFile):
     generators = 'qbs'
 
     def build(self):
-        self.run('qbs --command-echo-mode command-line -f "%s"' % self.source_folder)
+        self.run('qbs -f "%s"' % self.source_folder)
 
     def imports(self):
         self.copy('*', src='bin', dst='bin')
