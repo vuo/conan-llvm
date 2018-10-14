@@ -38,8 +38,7 @@ before_install:
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
              travis_wait choco install --no-progress python3 qbs
-          && dir C:\\Python37
-          && dir C:\\Python37\\Tools
+          && dir /s C:\\Python37
           && C:\\Python37\\Tools\\pip install conan
           && conan config install https://vuo.org/sites/default/files/conan-windows.zip
       ; fi
