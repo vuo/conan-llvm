@@ -17,6 +17,8 @@ class LlvmTestConan(ConanFile):
             libext = 'dylib'
         elif platform.system() == 'Linux':
             libext = 'so'
+        elif platform.system() == 'Windows':
+            libext = 'dll'
 
         self.run('qbs run -f "%s"' % self.source_folder)
 

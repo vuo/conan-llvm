@@ -22,6 +22,7 @@ matrix:
                       - libc++abi-dev
                       - libc++abi1
                       - qt59qbs
+        - os: windows
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -34,6 +35,11 @@ before_install:
           && conan config install https://vuo.org/sites/default/files/conan-linux.zip
           && . /opt/qt59/bin/qt59-env.sh
       ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+             pip install conan
+          && choco install llvm qbs
+          && conan config install https://vuo.org/sites/default/files/conan-windows.zip
+      ; fi
 
 install:
     - qbs --version
@@ -45,5 +51,5 @@ install:
     - conan user
 
 script:
-    - conan create . vuo/stable
+    - conan create . vuo/test
       && travis_wait conan upload --remote vuo --all --confirm llvm/*
