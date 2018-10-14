@@ -23,6 +23,7 @@ matrix:
                       - libc++abi1
                       - qt59qbs
         - os: windows
+          language: sh
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
