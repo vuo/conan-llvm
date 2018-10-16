@@ -38,7 +38,7 @@ before_install:
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
              export PATH="$PATH:/c/Python37/Scripts"
-          && reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+          && reg add "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
           && travis_wait choco install --no-progress python3 qbs
           && pip install conan
           && conan config install https://vuo.org/sites/default/files/conan-windows.zip
