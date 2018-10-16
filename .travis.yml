@@ -41,7 +41,7 @@ before_install:
           && travis_wait choco install --no-progress python3 qbs
           && pip install conan
           && conan config install https://vuo.org/sites/default/files/conan-windows.zip
-          && find / -name cmake.exe
+          && travis_wait find /c -name cmake.exe
       ; fi
 
 install:
