@@ -19,6 +19,7 @@ class LlvmConan(ConanFile):
     build_dir = '_build'
     install_dir = '_install'
     exports_sources = '*.patch'
+    short_paths = True
     libs = {
         'LLVMAnalysis': 0,
         'LLVMArchive': 0,
