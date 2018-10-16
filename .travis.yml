@@ -37,11 +37,10 @@ before_install:
           && . /opt/qt59/bin/qt59-env.sh
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-             export PATH="$PATH:/c/Python37/Scripts"
+             export PATH="$PATH:/c/Python37/Scripts:/c/Program Files/CMake/bin"
           && travis_wait choco install --no-progress python3 qbs
           && pip install conan
           && conan config install https://vuo.org/sites/default/files/conan-windows.zip
-          && travis_wait find /c -name cmake.exe
       ; fi
 
 install:
