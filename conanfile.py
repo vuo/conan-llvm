@@ -7,7 +7,7 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.3'
-    package_version = '5'
+    package_version = '6'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.1@vuo/stable'
@@ -84,6 +84,7 @@ class LlvmConan(ConanFile):
         'clangStaticAnalyzerCore': 0,
         'clangStaticAnalyzerFrontend': 0,
         'clangTooling': 0,
+        'profile_rt': 0,
     }
     executables = [
         'clang',
@@ -109,6 +110,10 @@ class LlvmConan(ConanFile):
                   sha256='c403ed18d2992719c794cdd760dc87a948b62a7c2a07beb39eb984dfeb1679f1')
         shutil.move('libcxx-%s.src' % self.source_version, '%s/projects/libcxx' % self.source_dir)
 
+        tools.get('http://llvm.org/releases/%s/compiler-rt-%s.src.tar.gz' % (self.source_version, self.source_version),
+                  sha256='0e2f3180d6316e6c43f064fdd406c5c6515e682c5f31c57c28335b68c7525423')
+        shutil.move('compiler-rt-%s.src' % self.source_version, '%s/projects/compiler-rt' % self.source_dir)
+
         # https://b33p.net/kosada/node/7848#comment-32297
         tools.patch(patch_file='disable-unused-intrinsics.patch', base_path=self.source_dir)
 
@@ -132,8 +137,6 @@ class LlvmConan(ConanFile):
             cmake.definitions['CMAKE_BUILD_TYPE'] = 'Release'
             cmake.definitions['CMAKE_C_FLAGS'] = '-O3 -march=x86-64'
             cmake.definitions['CMAKE_CXX_FLAGS'] = cmake.definitions['CMAKE_C_FLAGS'] + ' -std=c++11 -stdlib=libc++'
-            cmake.definitions['CMAKE_SHARED_LINKER_FLAGS'] = '-stdlib=libc++'
-            cmake.definitions['CMAKE_STATIC_LINKER_FLAGS'] = '-stdlib=libc++'
             cmake.definitions['CMAKE_INSTALL_PREFIX'] = '%s/../%s' % (os.getcwd(), self.install_dir)
 
             cmake.definitions['BUILD_SHARED_LIBS'] = 'ON'
@@ -157,7 +160,7 @@ class LlvmConan(ConanFile):
             cmake.definitions['LLVM_EXPERIMENTAL_TARGETS_TO_BUILD'] = ''
             cmake.definitions['LLVM_EXTERNAL_CLANG_BUILD'] = 'ON'
             cmake.definitions['LLVM_INCLUDE_EXAMPLES'] = 'OFF'
-            cmake.definitions['LLVM_INCLUDE_RUNTIME'] = 'OFF'
+            cmake.definitions['LLVM_INCLUDE_RUNTIME'] = 'ON'
             cmake.definitions['LLVM_INCLUDE_TESTS'] = 'OFF'
             cmake.definitions['LLVM_INCLUDE_TOOLS'] = 'ON'
             cmake.definitions['LLVM_LIT_ARGS'] = '-sv'
@@ -190,8 +193,8 @@ class LlvmConan(ConanFile):
             tools.mkdir(libcxx_build_dir)
             with tools.chdir(libcxx_build_dir):
                 if platform.system() == 'Darwin':
-                    cmake.definitions['CMAKE_SHARED_LINKER_FLAGS'] += ' /usr/lib/libc++abi.dylib'
-                    cmake.definitions['CMAKE_STATIC_LINKER_FLAGS'] += ' /usr/lib/libc++abi.dylib'
+                    cmake.definitions['CMAKE_SHARED_LINKER_FLAGS'] = ' /usr/lib/libc++abi.dylib'
+                    cmake.definitions['CMAKE_STATIC_LINKER_FLAGS'] = ' /usr/lib/libc++abi.dylib'
                 cmake.configure(source_dir='../../%s/projects/libcxx' % self.source_dir,
                                 build_dir='.')
                 cmake.build()
@@ -232,6 +235,7 @@ class LlvmConan(ConanFile):
 
         for f in list(self.libs.keys()):
             self.copy('lib%s.%s' % (f, libext), src='%s/lib' % self.install_dir, dst='lib')
+        self.copy('*', src='%s/lib/clang/%s/lib/darwin' % (self.install_dir, self.source_version), dst='lib/clang/%s/lib/darwin' % self.source_version)
         # Yes, these are include files that need to be copied to the lib folder.
         self.copy('*', src='%s/lib/clang/%s/include' % (self.install_dir, self.source_version), dst='lib/clang/%s/include' % self.source_version)
 
@@ -245,5 +249,6 @@ class LlvmConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = list(self.libs.keys())
         self.cpp_info.libs += ['c++abi']
+        self.cpp_info.libs.remove('profile_rt')
 
         self.cpp_info.includedirs = ['include', 'include/c++/v1/']
