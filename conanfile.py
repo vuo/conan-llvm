@@ -7,7 +7,7 @@ class LlvmConan(ConanFile):
     name = 'llvm'
 
     source_version = '3.3'
-    package_version = '6'
+    package_version = '7'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.1@vuo/stable'
@@ -87,9 +87,57 @@ class LlvmConan(ConanFile):
         'profile_rt': 0,
     }
     executables = [
+        'FileCheck',
+        'bugpoint',
+        'c-index-test',
         'clang',
         'clang++',
+        'clang-apply-replacements',
+        'clang-check',
+        'clang-format',
+        'clang-modernize',
+        'clang-query',
+        'clang-rename',
+        'clang-tblgen',
+        'clang-tidy',
+        'count',
+        'llc',
+        'lli',
+        'lli-child-target',
+        'llvm-ar',
+        'llvm-as',
+        'llvm-bcanalyzer',
+        'llvm-config',
+        'llvm-cov',
+        'llvm-cxxdump',
+        'llvm-diff',
+        'llvm-dis',
+        'llvm-dsymutil',
+        'llvm-dwarfdump',
+        'llvm-extract',
         'llvm-link',
+        'llvm-mc',
+        'llvm-mcmarkup',
+        'llvm-nm',
+        'llvm-objdump',
+        'llvm-pdbdump',
+        'llvm-profdata',
+        'llvm-ranlib',
+        'llvm-readobj',
+        'llvm-rtdyld',
+        'llvm-size',
+        'llvm-stress',
+        'llvm-symbolizer',
+        'llvm-tblgen',
+        'macho-dump',
+        'not',
+        'obj2yaml',
+        'opt',
+        'pp-trace',
+        'scan-build',
+        'scan-view',
+        'verify-uselistorder',
+        'yaml2obj',
     ]
 
     def requirements(self):
