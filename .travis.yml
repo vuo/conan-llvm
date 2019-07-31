@@ -38,19 +38,20 @@ cache:
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-             brew update &> /dev/null
+             export HOMEBREW_NO_INSTALL_CLEANUP=1
+          && brew update &> /dev/null
           && ( brew link libffi     || travis_wait brew install --force-bottle libffi     )
+          && ( brew link openssl    || travis_wait brew install --force-bottle openssl    )
           && ( brew link xz         || travis_wait brew install --force-bottle xz         )
           && brew upgrade --force-bottle python
           && brew postinstall python
-          && ls -l /usr/local/bin /usr/local/opt/python/libexec/bin /usr/local/Cellar/python /usr/local/Cellar/python/3.7.2/bin
-          && /usr/local/Cellar/python/3.7.2/bin/pip3 install setuptools
+          && /usr/local/Cellar/python/3.7.4/bin/pip3 install setuptools
           && ( brew link conan      || travis_wait brew install --force-bottle conan      )
-          && conan config install https://vuo.org/sites/default/files/conan-macos.zip
+          && conan config install --source-folder vuo-conan https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
              pip install conan
-          && conan config install https://vuo.org/sites/default/files/conan-linux.zip
+          && conan config install --source-folder vuo-conan https://vuo.org/sites/default/files/conan-linux.zip
           && . /opt/qt59/bin/qt59-env.sh
           && qbs --version
           && qbs setup-qt --detect
