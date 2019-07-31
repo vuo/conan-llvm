@@ -23,30 +23,17 @@ matrix:
                       - libc++abi1
                       - qt59qbs
 
-cache:
-    directories:
-        - /usr/local/Cellar/conan
-        - /usr/local/Cellar/gdbm
-        - /usr/local/Cellar/libffi
-        - /usr/local/Cellar/openssl
-        - /usr/local/Cellar/pkg-config
-        - /usr/local/Cellar/python
-        - /usr/local/Cellar/readline
-        - /usr/local/Cellar/sqlite
-        - /usr/local/Cellar/xz
-        - /usr/local/opt/python
-
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              export HOMEBREW_NO_INSTALL_CLEANUP=1
           && brew update &> /dev/null
-          && ( brew link libffi     || travis_wait brew install --force-bottle libffi     )
-          && ( brew link openssl    || travis_wait brew install --force-bottle openssl    )
-          && ( brew link xz         || travis_wait brew install --force-bottle xz         )
+          && travis_wait brew install --force-bottle libffi
+          && travis_wait brew install --force-bottle openssl
+          && travis_wait brew install --force-bottle xz
           && brew upgrade --force-bottle python
           && brew postinstall python
           && /usr/local/Cellar/python/3.7.4/bin/pip3 install setuptools
-          && ( brew link conan      || travis_wait brew install --force-bottle conan      )
+          && travis_wait brew install --force-bottle conan
           && conan config install --source-folder vuo-conan https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
