@@ -1,24 +1,25 @@
-from conans import ConanFile
-import os
+from conans import ConanFile, CMake
 import platform
 
 class LlvmTestConan(ConanFile):
-    generators = 'qbs'
+    generators = 'cmake'
 
     def build(self):
-        self.run('qbs -f "%s"' % self.source_folder)
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
     def imports(self):
         self.copy('*', src='bin', dst='bin')
         self.copy('*', src='lib', dst='lib')
 
     def test(self):
+        self.run('./bin/test_package')
+
         if platform.system() == 'Darwin':
             libext = 'dylib'
         elif platform.system() == 'Linux':
             libext = 'so'
-
-        self.run('qbs run -f "%s"' % self.source_folder)
 
         # Ensure we only link to system libraries.
         for f in [
@@ -36,7 +37,6 @@ class LlvmTestConan(ConanFile):
                 self.run('! (ldd ' + f + ' | fgrep "libstdc++")')
 
         libs = self.deps_cpp_info['llvm'].libs
-        libs.remove('c++abi')
         for f in libs:
             self.output.info('Checking %s...' % f)
             if platform.system() == 'Darwin':

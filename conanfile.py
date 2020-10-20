@@ -6,11 +6,12 @@ import platform
 class LlvmConan(ConanFile):
     name = 'llvm'
 
-    source_version = '3.3'
-    package_version = '7'
+    source_version = '3.7.1'
+    source_version_major_minor = '3.7'
+    package_version = '0'
     version = '%s-%s' % (source_version, package_version)
 
-    build_requires = 'vuoutils/1.1@vuo/stable'
+    build_requires = 'vuoutils/1.2@vuo/stable'
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://github.com/vuo/conan-llvm'
     license = 'http://releases.llvm.org/%s/LICENSE.TXT' % source_version
@@ -18,73 +19,88 @@ class LlvmConan(ConanFile):
     source_dir  = 'llvm-%s.src' % source_version
     build_dir = '_build'
     install_dir = '_install'
+    llvm_dylib_base = 'LLVM-%s' % source_version_major_minor
+    llvm_dylib = 'lib%s.dylib' % llvm_dylib_base
     exports_sources = '*.patch'
     libs = {
-        'LLVMAnalysis': 0,
-        'LLVMArchive': 0,
-        'LLVMAsmParser': 0,
-        'LLVMAsmPrinter': 0,
-        'LLVMBitReader': 0,
-        'LLVMBitWriter': 0,
-        'LLVMCodeGen': 0,
-        'LLVMCore': 0,
-        'LLVMDebugInfo': 0,
-        'LLVMExecutionEngine': 0,
-        'LLVMIRReader': 0,
-        'LLVMInstCombine': 0,
-        'LLVMInstrumentation': 0,
-        'LLVMInterpreter': 0,
-        'LLVMJIT': 0,
-        'LLVMLinker': 0,
-        'LLVMMC': 0,
-        'LLVMMCDisassembler': 0,
-        'LLVMMCJIT': 0,
-        'LLVMMCParser': 0,
-        'LLVMObjCARCOpts': 0,
-        'LLVMObject': 0,
-        'LLVMOption': 0,
-        'LLVMRuntimeDyld': 0,
-        'LLVMScalarOpts': 0,
-        'LLVMSelectionDAG': 0,
-        'LLVMSupport': 0,
-        'LLVMTableGen': 0,
-        'LLVMTarget': 0,
-        'LLVMTransformUtils': 0,
-        'LLVMVectorize': 0,
-        'LLVMX86AsmParser': 0,
-        'LLVMX86AsmPrinter': 0,
-        'LLVMX86CodeGen': 0,
-        'LLVMX86Desc': 0,
-        'LLVMX86Disassembler': 0,
-        'LLVMX86Info': 0,
-        'LLVMX86Utils': 0,
-        'LLVMipa': 0,
-        'LLVMipo': 0,
-        'LTO': 0,
-        'c++': 0,
-        'clang': 0,
-        'clangARCMigrate': 0,
-        'clangAST': 0,
-        'clangASTMatchers': 0,
-        'clangAnalysis': 0,
-        'clangBasic': 0,
-        'clangCodeGen': 0,
-        'clangDriver': 0,
-        'clangEdit': 0,
-        'clangFormat': 0,
-        'clangFrontend': 0,
-        'clangFrontendTool': 0,
-        'clangLex': 0,
-        'clangParse': 0,
-        'clangRewriteCore': 0,
-        'clangRewriteFrontend': 0,
-        'clangSema': 0,
-        'clangSerialization': 0,
-        'clangStaticAnalyzerCheckers': 0,
-        'clangStaticAnalyzerCore': 0,
-        'clangStaticAnalyzerFrontend': 0,
-        'clangTooling': 0,
-        'profile_rt': 0,
+        'LLVMAArch64AsmParser': source_version_major_minor,
+        'LLVMAArch64AsmPrinter': source_version_major_minor,
+        'LLVMAArch64CodeGen': source_version_major_minor,
+        'LLVMAArch64Desc': source_version_major_minor,
+        'LLVMAArch64Disassembler': source_version_major_minor,
+        'LLVMAArch64Info': source_version_major_minor,
+        'LLVMAArch64Utils': source_version_major_minor,
+        'LLVMAnalysis': source_version_major_minor,
+        'LLVMAsmParser': source_version_major_minor,
+        'LLVMAsmPrinter': source_version_major_minor,
+        'LLVMBitReader': source_version_major_minor,
+        'LLVMBitWriter': source_version_major_minor,
+        'LLVMCodeGen': source_version_major_minor,
+        'LLVMCore': source_version_major_minor,
+        'LLVMDebugInfoDWARF': source_version_major_minor,
+        'LLVMDebugInfoPDB': source_version_major_minor,
+        'LLVMExecutionEngine': source_version_major_minor,
+        'LLVMIRReader': source_version_major_minor,
+        'LLVMInstCombine': source_version_major_minor,
+        'LLVMInstrumentation': source_version_major_minor,
+        'LLVMInterpreter': source_version_major_minor,
+        'LLVMLTO': source_version_major_minor,
+        'LLVMLibDriver': source_version_major_minor,
+        'LLVMLinker': source_version_major_minor,
+        'LLVMMC': source_version_major_minor,
+        'LLVMMCDisassembler': source_version_major_minor,
+        'LLVMMCJIT': source_version_major_minor,
+        'LLVMMCParser': source_version_major_minor,
+        'LLVMMIRParser': source_version_major_minor,
+        'LLVMObjCARCOpts': source_version_major_minor,
+        'LLVMObject': source_version_major_minor,
+        'LLVMOption': source_version_major_minor,
+        'LLVMOrcJIT': source_version_major_minor,
+        'LLVMPasses': source_version_major_minor,
+        'LLVMProfileData': source_version_major_minor,
+        'LLVMRuntimeDyld': source_version_major_minor,
+        'LLVMScalarOpts': source_version_major_minor,
+        'LLVMSelectionDAG': source_version_major_minor,
+        'LLVMSupport': source_version_major_minor,
+        'LLVMTableGen': source_version_major_minor,
+        'LLVMTarget': source_version_major_minor,
+        'LLVMTransformUtils': source_version_major_minor,
+        'LLVMVectorize': source_version_major_minor,
+        'LLVMX86AsmParser': source_version_major_minor,
+        'LLVMX86AsmPrinter': source_version_major_minor,
+        'LLVMX86CodeGen': source_version_major_minor,
+        'LLVMX86Desc': source_version_major_minor,
+        'LLVMX86Disassembler': source_version_major_minor,
+        'LLVMX86Info': source_version_major_minor,
+        'LLVMX86Utils': source_version_major_minor,
+        'LLVMipa': source_version_major_minor,
+        'LLVMipo': source_version_major_minor,
+        'LTO': source_version_major_minor,
+        'c++': source_version_major_minor,
+        'clang': source_version_major_minor,
+        'clangARCMigrate': source_version_major_minor,
+        'clangAST': source_version_major_minor,
+        'clangASTMatchers': source_version_major_minor,
+        'clangAnalysis': source_version_major_minor,
+        'clangBasic': source_version_major_minor,
+        'clangCodeGen': source_version_major_minor,
+        'clangDriver': source_version_major_minor,
+        'clangEdit': source_version_major_minor,
+        'clangFormat': source_version_major_minor,
+        'clangFrontend': source_version_major_minor,
+        'clangFrontendTool': source_version_major_minor,
+        'clangIndex': source_version_major_minor,
+        'clangLex': source_version_major_minor,
+        'clangParse': source_version_major_minor,
+        'clangRewrite': source_version_major_minor,
+        'clangRewriteFrontend': source_version_major_minor,
+        'clangSema': source_version_major_minor,
+        'clangSerialization': source_version_major_minor,
+        'clangStaticAnalyzerCheckers': source_version_major_minor,
+        'clangStaticAnalyzerCore': source_version_major_minor,
+        'clangStaticAnalyzerFrontend': source_version_major_minor,
+        'clangTooling': source_version_major_minor,
+        'clangToolingCore': source_version_major_minor,
     }
     executables = [
         'bugpoint',
@@ -92,7 +108,6 @@ class LlvmConan(ConanFile):
         'clang++',
         'clang-check',
         'clang-format',
-        'clang-tblgen',
         'llc',
         'lli',
         'llvm-ar',
@@ -127,34 +142,29 @@ class LlvmConan(ConanFile):
             raise Exception('Unknown platform "%s"' % platform.system())
 
     def source(self):
-        tools.get('http://llvm.org/releases/%s/llvm-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='68766b1e70d05a25e2f502e997a3cb3937187a3296595cf6e0977d5cd6727578')
+        tools.get('https://releases.llvm.org/%s/llvm-%s.src.tar.xz' % (self.source_version, self.source_version),
+                  sha256='be7794ed0cec42d6c682ca8e3517535b54555a3defabec83554dbc74db545ad5')
 
-        tools.get('http://llvm.org/releases/%s/cfe-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='b1b55de4ab3a57d3e0331a83e0284610191c77d924e3446498d9113d08dfb996')
+        tools.get('https://releases.llvm.org/%s/cfe-%s.src.tar.xz' % (self.source_version, self.source_version),
+                  sha256='56e2164c7c2a1772d5ed2a3e57485ff73ff06c97dff12edbeea1acc4412b0674')
         shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
 
-        tools.get('http://llvm.org/releases/%s/libcxx-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='c403ed18d2992719c794cdd760dc87a948b62a7c2a07beb39eb984dfeb1679f1')
+        tools.get('https://releases.llvm.org/%s/libcxx-%s.src.tar.xz' % (self.source_version, self.source_version),
+                  sha256='357fbd4288ce99733ba06ae2bec6f503413d258aeebaab8b6a791201e6f7f144')
         shutil.move('libcxx-%s.src' % self.source_version, '%s/projects/libcxx' % self.source_dir)
 
-        tools.get('http://llvm.org/releases/%s/compiler-rt-%s.src.tar.gz' % (self.source_version, self.source_version),
-                  sha256='0e2f3180d6316e6c43f064fdd406c5c6515e682c5f31c57c28335b68c7525423')
+        tools.get('https://releases.llvm.org/%s/compiler-rt-%s.src.tar.xz' % (self.source_version, self.source_version),
+                  sha256='9d4769e4a927d3824bcb7a9c82b01e307c68588e6de4e7f04ab82d82c5af8181')
         shutil.move('compiler-rt-%s.src' % self.source_version, '%s/projects/compiler-rt' % self.source_dir)
 
-        # https://b33p.net/kosada/node/7848#comment-32297
-        tools.patch(patch_file='disable-unused-intrinsics.patch', base_path=self.source_dir)
+        tools.patch(patch_file='libcxx.patch', base_path=self.source_dir)
 
         if platform.system() == 'Linux':
             tools.patch(patch_file='linux-offsetof.patch', base_path=self.source_dir)
 
-        tools.replace_in_file('%s/cmake/config-ix.cmake' % self.source_dir,
-            'check_include_file(sanitizer/msan_interface.h HAVE_SANITIZER_MSAN_INTERFACE_H)',
-            '')
-
-        self.run('mv %s/LICENSE.TXT %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
-        self.run('mv %s/include/llvm/Support/LICENSE.TXT %s/%s-systemsupport.txt' % (self.source_dir, self.source_dir, self.name))
-        self.run('mv %s/tools/clang/LICENSE.TXT %s/clang.txt' % (self.source_dir, self.source_dir))
+        self.run('cp %s/LICENSE.TXT %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
+        self.run('cp %s/include/llvm/Support/LICENSE.TXT %s/%s-systemsupport.txt' % (self.source_dir, self.source_dir, self.name))
+        self.run('cp %s/tools/clang/LICENSE.TXT %s/clang.txt' % (self.source_dir, self.source_dir))
 
     def build(self):
         import VuoUtils
@@ -167,9 +177,15 @@ class LlvmConan(ConanFile):
             cmake.definitions['CMAKE_CXX_FLAGS'] = cmake.definitions['CMAKE_C_FLAGS'] + ' -std=c++11 -stdlib=libc++'
             cmake.definitions['CMAKE_INSTALL_PREFIX'] = '%s/../%s' % (os.getcwd(), self.install_dir)
 
+            cmake.definitions['BUILD_CLANG_FORMAT_VS_PLUGIN'] = 'OFF'
             cmake.definitions['BUILD_SHARED_LIBS'] = 'ON'
             cmake.definitions['CLANG_BUILD_EXAMPLES'] = 'OFF'
+            cmake.definitions['CLANG_DEFAULT_OPENMP_RUNTIME'] = 'libgomp'
+            cmake.definitions['CLANG_ENABLE_ARCMT'] = 'ON'
+            cmake.definitions['CLANG_ENABLE_STATIC_ANALYZER'] = 'ON'
+            cmake.definitions['CLANG_INCLUDE_DOCS'] = 'OFF'
             cmake.definitions['CLANG_INCLUDE_TESTS'] = 'OFF'
+            cmake.definitions['CLANG_PLUGIN_SUPPORT'] = 'OFF'
             cmake.definitions['LLVM_BUILD_32_BITS'] = 'OFF'
             cmake.definitions['LLVM_BUILD_EXAMPLES'] = 'OFF'
             cmake.definitions['LLVM_BUILD_RUNTIME'] = 'ON'
@@ -177,6 +193,7 @@ class LlvmConan(ConanFile):
             cmake.definitions['LLVM_BUILD_TOOLS'] = 'ON'
             cmake.definitions['LLVM_ENABLE_ASSERTIONS'] = 'ON'
             cmake.definitions['LLVM_ENABLE_BACKTRACES'] = 'OFF'
+            cmake.definitions['LLVM_ENABLE_DOXYGEN'] = 'OFF'
             cmake.definitions['LLVM_ENABLE_FFI'] = 'OFF'
             cmake.definitions['LLVM_ENABLE_PEDANTIC'] = 'ON'
             cmake.definitions['LLVM_ENABLE_PIC'] = 'ON'
@@ -187,24 +204,25 @@ class LlvmConan(ConanFile):
             cmake.definitions['LLVM_ENABLE_LIBCXX'] = 'ON'
             cmake.definitions['LLVM_EXPERIMENTAL_TARGETS_TO_BUILD'] = ''
             cmake.definitions['LLVM_EXTERNAL_CLANG_BUILD'] = 'ON'
+            cmake.definitions['LLVM_INCLUDE_DOCS'] = 'OFF'
             cmake.definitions['LLVM_INCLUDE_EXAMPLES'] = 'OFF'
-            cmake.definitions['LLVM_INCLUDE_RUNTIME'] = 'ON'
             cmake.definitions['LLVM_INCLUDE_TESTS'] = 'OFF'
             cmake.definitions['LLVM_INCLUDE_TOOLS'] = 'ON'
             cmake.definitions['LLVM_LIT_ARGS'] = '-sv'
-            cmake.definitions['LLVM_TARGETS_TO_BUILD'] = 'X86'
+            cmake.definitions['LLVM_TARGETS_TO_BUILD'] = 'X86;AArch64'
             cmake.definitions['LLVM_TARGET_ARCH'] = 'host'
             cmake.definitions['LLVM_USE_FOLDERS'] = 'ON'
             cmake.definitions['LLVM_USE_INTEL_JITEVENTS'] = 'OFF'
             cmake.definitions['LLVM_USE_OPROFILE'] = 'OFF'
 
             if platform.system() == 'Darwin':
-                cmake.definitions['CMAKE_C_FLAGS'] += ' -mmacosx-version-min=10.10'
-                cmake.definitions['CMAKE_CXX_FLAGS'] += ' -mmacosx-version-min=10.10'
+                cmake.definitions['CMAKE_C_FLAGS'] += ' -mmacosx-version-min=10.11'
+                cmake.definitions['CMAKE_CXX_FLAGS'] += ' -mmacosx-version-min=10.11'
                 cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang'
                 cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++'
                 cmake.definitions['CMAKE_OSX_ARCHITECTURES'] = 'x86_64'
-                cmake.definitions['CMAKE_OSX_DEPLOYMENT_TARGET'] = '10.10'
+                cmake.definitions['CMAKE_OSX_DEPLOYMENT_TARGET'] = '10.11'
+                cmake.definitions['CMAKE_OSX_SYSROOT'] = '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk'
             elif platform.system() == 'Linux':
                 cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang-5.0'
                 cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++-5.0'
@@ -220,9 +238,6 @@ class LlvmConan(ConanFile):
             libcxx_build_dir = 'libcxx'
             tools.mkdir(libcxx_build_dir)
             with tools.chdir(libcxx_build_dir):
-                if platform.system() == 'Darwin':
-                    cmake.definitions['CMAKE_SHARED_LINKER_FLAGS'] = ' /usr/lib/libc++abi.dylib'
-                    cmake.definitions['CMAKE_STATIC_LINKER_FLAGS'] = ' /usr/lib/libc++abi.dylib'
                 cmake.configure(source_dir='../../%s/projects/libcxx' % self.source_dir,
                                 build_dir='.')
                 cmake.build()
@@ -231,22 +246,22 @@ class LlvmConan(ConanFile):
         with tools.chdir(self.install_dir):
             with tools.chdir('bin'):
                 self.run('rm clang')
-                self.run('mv clang-3.3 clang')
+                self.run('mv clang-%s clang' % self.source_version_major_minor)
             with tools.chdir('lib'):
                 if platform.system() == 'Darwin':
                     self.run('rm libclang.dylib')
-                    self.run('mv libclang.3.3.dylib libclang.dylib')
+                    self.run('mv libclang.%s.dylib libclang.dylib' % self.source_version_major_minor)
                     self.run('rm libc++.dylib')
                     self.run('mv libc++.1.0.dylib libc++.dylib')
                 elif platform.system() == 'Linux':
                     self.run('rm libclang.so')
-                    self.run('mv libclang.so.3.3 libclang.so')
+                    self.run('mv libclang.so.%s libclang.so' % self.source_version_major_minor)
                     self.run('rm libc++.so')
                     self.run('mv libc++.so.1.0 libc++.so')
-                VuoUtils.fixLibs(self.libs, self.deps_cpp_info, False)
+                VuoUtils.fixLibs(self.libs, self.deps_cpp_info)
 
             with tools.chdir('bin'):
-                VuoUtils.fixExecutables(self.executables, self.libs, self.deps_cpp_info, False)
+                VuoUtils.fixExecutables(self.executables, self.libs, self.deps_cpp_info)
 
             if platform.system() == 'Linux':
                 patchelf = self.deps_cpp_info['patchelf'].rootpath + '/bin/patchelf'
@@ -276,7 +291,4 @@ class LlvmConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = list(self.libs.keys())
-        self.cpp_info.libs += ['c++abi']
-        self.cpp_info.libs.remove('profile_rt')
-
         self.cpp_info.includedirs = ['include', 'include/c++/v1/']
