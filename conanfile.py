@@ -138,7 +138,9 @@ class LlvmConan(ConanFile):
     def requirements(self):
         if platform.system() == 'Linux':
             self.requires('patchelf/0.10pre-1@vuo/stable')
-        elif platform.system() != 'Darwin':
+        elif platform.system() == 'Darwin':
+            self.requires('macos-sdk/10.11-0@vuo/stable')
+        else:
             raise Exception('Unknown platform "%s"' % platform.system())
 
     def source(self):
@@ -222,7 +224,7 @@ class LlvmConan(ConanFile):
                 cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++'
                 cmake.definitions['CMAKE_OSX_ARCHITECTURES'] = 'x86_64'
                 cmake.definitions['CMAKE_OSX_DEPLOYMENT_TARGET'] = '10.11'
-                cmake.definitions['CMAKE_OSX_SYSROOT'] = '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk'
+                cmake.definitions['CMAKE_OSX_SYSROOT'] = self.deps_cpp_info['macos-sdk'].rootpath
             elif platform.system() == 'Linux':
                 cmake.definitions['CMAKE_C_COMPILER']   = '/usr/bin/clang-5.0'
                 cmake.definitions['CMAKE_CXX_COMPILER'] = '/usr/bin/clang++-5.0'
