@@ -6,8 +6,8 @@ import platform
 class LlvmConan(ConanFile):
     name = 'llvm'
 
-    source_version = '4.0.1'
-    source_version_major_minor = '4.0'
+    source_version = '5.0.2'
+    source_version_major_minor = '5.0'
     package_version = '0'
     version = '%s-%s' % (source_version, package_version)
 
@@ -33,6 +33,7 @@ class LlvmConan(ConanFile):
         'LLVMAnalysis': source_version_major_minor,
         'LLVMAsmParser': source_version_major_minor,
         'LLVMAsmPrinter': source_version_major_minor,
+        'LLVMBinaryFormat': source_version_major_minor,
         'LLVMBitReader': source_version_major_minor,
         'LLVMBitWriter': source_version_major_minor,
         'LLVMCodeGen': source_version_major_minor,
@@ -142,28 +143,28 @@ class LlvmConan(ConanFile):
     def requirements(self):
         if platform.system() == 'Linux':
             self.requires('patchelf/0.10pre-1@vuo/stable')
-        elif platform.system() == 'Darwin':
-            self.requires('macos-sdk/10.11-0@vuo/stable')
-        else:
+        elif platform.system() != 'Darwin':
             raise Exception('Unknown platform "%s"' % platform.system())
+
+    def build_requirements(self):
+        if platform.system() == 'Darwin':
+            self.build_requires('macos-sdk/10.11-0@vuo/stable')
 
     def source(self):
         tools.get('https://releases.llvm.org/%s/llvm-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51')
+                  sha256='d522eda97835a9c75f0b88ddc81437e5edbb87dc2740686cb8647763855c2b3c')
 
         tools.get('https://releases.llvm.org/%s/cfe-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='61738a735852c23c3bdbe52d035488cdb2083013f384d67c1ba36fabebd8769b')
+                  sha256='fa9ce9724abdb68f166deea0af1f71ca0dfa9af8f7e1261f2cae63c280282800')
         shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
 
         tools.get('https://releases.llvm.org/%s/libcxx-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='520a1171f272c9ff82f324d5d89accadcec9bc9f3c78de11f5575cdb99accc4c')
+                  sha256='6edf88e913175536e1182058753fff2365e388e017a9ec7427feb9929c52e298')
         shutil.move('libcxx-%s.src' % self.source_version, '%s/projects/libcxx' % self.source_dir)
 
         tools.get('https://releases.llvm.org/%s/compiler-rt-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='a3c87794334887b93b7a766c507244a7cdcce1d48b2e9249fc9a94f2c3beb440')
+                  sha256='3efe9ddf3f69e0c0a45cde57ee93911f36f3ab5f2a7f6ab8c8efb3db9b24ed46')
         shutil.move('compiler-rt-%s.src' % self.source_version, '%s/projects/compiler-rt' % self.source_dir)
-
-        tools.patch(patch_file='clang-lambda.patch', base_path=self.source_dir)
 
         if platform.system() == 'Linux':
             tools.patch(patch_file='linux-offsetof.patch', base_path=self.source_dir)
@@ -212,7 +213,8 @@ class LlvmConan(ConanFile):
             cmake.definitions['LLVM_EXTERNAL_CLANG_BUILD'] = 'ON'
             cmake.definitions['LLVM_INCLUDE_DOCS'] = 'OFF'
             cmake.definitions['LLVM_INCLUDE_EXAMPLES'] = 'OFF'
-            cmake.definitions['LLVM_INCLUDE_TESTS'] = 'OFF'
+            cmake.definitions['LLVM_INCLUDE_GO_TESTS'] = 'OFF'
+            cmake.definitions['LLVM_INCLUDE_TESTS'] = 'ON'
             cmake.definitions['LLVM_INCLUDE_TOOLS'] = 'ON'
             cmake.definitions['LLVM_LIT_ARGS'] = '-sv'
             cmake.definitions['LLVM_TARGETS_TO_BUILD'] = 'X86;AArch64'
