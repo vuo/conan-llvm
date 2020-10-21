@@ -6,8 +6,8 @@ import platform
 class LlvmConan(ConanFile):
     name = 'llvm'
 
-    source_version = '3.7.1'
-    source_version_major_minor = '3.7'
+    source_version = '4.0.1'
+    source_version_major_minor = '4.0'
     package_version = '0'
     version = '%s-%s' % (source_version, package_version)
 
@@ -37,9 +37,15 @@ class LlvmConan(ConanFile):
         'LLVMBitWriter': source_version_major_minor,
         'LLVMCodeGen': source_version_major_minor,
         'LLVMCore': source_version_major_minor,
+        'LLVMCoroutines': source_version_major_minor,
+        'LLVMCoverage': source_version_major_minor,
+        'LLVMDebugInfoCodeView': source_version_major_minor,
         'LLVMDebugInfoDWARF': source_version_major_minor,
+        'LLVMDebugInfoMSF': source_version_major_minor,
         'LLVMDebugInfoPDB': source_version_major_minor,
+        'LLVMDemangle': source_version_major_minor,
         'LLVMExecutionEngine': source_version_major_minor,
+        'LLVMGlobalISel': source_version_major_minor,
         'LLVMIRReader': source_version_major_minor,
         'LLVMInstCombine': source_version_major_minor,
         'LLVMInstrumentation': source_version_major_minor,
@@ -73,7 +79,6 @@ class LlvmConan(ConanFile):
         'LLVMX86Disassembler': source_version_major_minor,
         'LLVMX86Info': source_version_major_minor,
         'LLVMX86Utils': source_version_major_minor,
-        'LLVMipa': source_version_major_minor,
         'LLVMipo': source_version_major_minor,
         'LTO': source_version_major_minor,
         'c++': source_version_major_minor,
@@ -131,7 +136,6 @@ class LlvmConan(ConanFile):
         'llvm-stress',
         'llvm-symbolizer',
         'llvm-tblgen',
-        'macho-dump',
         'opt',
     ]
 
@@ -145,21 +149,21 @@ class LlvmConan(ConanFile):
 
     def source(self):
         tools.get('https://releases.llvm.org/%s/llvm-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='be7794ed0cec42d6c682ca8e3517535b54555a3defabec83554dbc74db545ad5')
+                  sha256='da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51')
 
         tools.get('https://releases.llvm.org/%s/cfe-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='56e2164c7c2a1772d5ed2a3e57485ff73ff06c97dff12edbeea1acc4412b0674')
+                  sha256='61738a735852c23c3bdbe52d035488cdb2083013f384d67c1ba36fabebd8769b')
         shutil.move('cfe-%s.src' % self.source_version, '%s/tools/clang' % self.source_dir)
 
         tools.get('https://releases.llvm.org/%s/libcxx-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='357fbd4288ce99733ba06ae2bec6f503413d258aeebaab8b6a791201e6f7f144')
+                  sha256='520a1171f272c9ff82f324d5d89accadcec9bc9f3c78de11f5575cdb99accc4c')
         shutil.move('libcxx-%s.src' % self.source_version, '%s/projects/libcxx' % self.source_dir)
 
         tools.get('https://releases.llvm.org/%s/compiler-rt-%s.src.tar.xz' % (self.source_version, self.source_version),
-                  sha256='9d4769e4a927d3824bcb7a9c82b01e307c68588e6de4e7f04ab82d82c5af8181')
+                  sha256='a3c87794334887b93b7a766c507244a7cdcce1d48b2e9249fc9a94f2c3beb440')
         shutil.move('compiler-rt-%s.src' % self.source_version, '%s/projects/compiler-rt' % self.source_dir)
 
-        tools.patch(patch_file='libcxx.patch', base_path=self.source_dir)
+        tools.patch(patch_file='clang-lambda.patch', base_path=self.source_dir)
 
         if platform.system() == 'Linux':
             tools.patch(patch_file='linux-offsetof.patch', base_path=self.source_dir)
@@ -251,8 +255,6 @@ class LlvmConan(ConanFile):
                 self.run('mv clang-%s clang' % self.source_version_major_minor)
             with tools.chdir('lib'):
                 if platform.system() == 'Darwin':
-                    self.run('rm libclang.dylib')
-                    self.run('mv libclang.%s.dylib libclang.dylib' % self.source_version_major_minor)
                     self.run('rm libc++.dylib')
                     self.run('mv libc++.1.0.dylib libc++.dylib')
                 elif platform.system() == 'Linux':
