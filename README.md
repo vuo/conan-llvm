@@ -1,1 +1,1 @@
-[![Build Status](https://travis-ci.org/vuo/conan-llvm.svg?branch=master)](https://travis-ci.org/vuo/conan-llvm)
+[ ![Download](https://api.bintray.com/packages/vuo/conan/llvm%3Avuo/images/download.svg) ](https://bintray.com/vuo/conan/llvm%3Avuo/_latestVersion)
