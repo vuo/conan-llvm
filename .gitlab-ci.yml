@@ -3,6 +3,7 @@ build:
         - macOS
         - Vuo
     script:
+        - clang --version | grep clang-1100 || (echo "Please run 'sudo xcode-select --switch /Applications/Xcode-11.3.app/Contents/Developer' to activate Xcode 11 (Xcode 12 is too new to build LLVM/Clang 5)." ; exit 1)
         - conan config install https://vuo.org/sites/default/files/conan-macos.zip
         - conan user
         - conan create . vuo/stable
