@@ -325,7 +325,10 @@ class LlvmConan(ConanFile):
                         self.install_arm_dir, f,
                         f))
                 VuoUtils.fixExecutables(self.executables, self.libs, self.deps_cpp_info)
-                for f in self.executables:
+
+                # Ad-hoc sign everything (except clang++, which is a symlink to clang).
+                self.run('codesign --sign - clang')
+                for f in otherExecutables:
                     self.run('codesign --sign - %s' % f)
 
         self.copy('*', src='%s/include'  % self.install_x86_dir, dst='include')
