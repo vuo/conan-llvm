@@ -8,7 +8,7 @@ class LlvmConan(ConanFile):
 
     source_version = '5.0.2'
     source_version_major_minor = '5.0'
-    package_version = '1'
+    package_version = '2'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.2@vuo/stable'
@@ -307,6 +307,8 @@ class LlvmConan(ConanFile):
                 for f in otherLibs:
                     self.run('lipo -create ../../%s/lib/lib%s.dylib ../../%s/lib/lib%s.dylib -output lib%s.dylib' % (self.install_x86_dir, f, self.install_arm_dir, f, f))
                 VuoUtils.fixLibs(self.libs, self.deps_cpp_info)
+                for f in self.libs:
+                    self.run('codesign --sign - lib%s.dylib' % f)
 
             tools.mkdir('bin')
             with tools.chdir('bin'):
@@ -323,6 +325,8 @@ class LlvmConan(ConanFile):
                         self.install_arm_dir, f,
                         f))
                 VuoUtils.fixExecutables(self.executables, self.libs, self.deps_cpp_info)
+                for f in self.executables:
+                    self.run('codesign --sign - %s' % f)
 
         self.copy('*', src='%s/include'  % self.install_x86_dir, dst='include')
         for f in list(self.libs.keys()):
