@@ -8,7 +8,7 @@ class LlvmConan(ConanFile):
 
     source_version = '5.0.2'
     source_version_major_minor = '5.0'
-    package_version = '2'
+    package_version = '3'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.2@vuo/stable'
@@ -52,6 +52,7 @@ class LlvmConan(ConanFile):
         'LLVMDebugInfoMSF': source_version_major_minor,
         'LLVMDebugInfoPDB': source_version_major_minor,
         'LLVMDemangle': source_version_major_minor,
+        'LLVMDlltoolDriver': source_version_major_minor,
         'LLVMExecutionEngine': source_version_major_minor,
         'LLVMGlobalISel': source_version_major_minor,
         'LLVMIRReader': source_version_major_minor,
@@ -76,6 +77,7 @@ class LlvmConan(ConanFile):
         'LLVMScalarOpts': source_version_major_minor,
         'LLVMSelectionDAG': source_version_major_minor,
         'LLVMSupport': source_version_major_minor,
+        'LLVMSymbolize': source_version_major_minor,
         'LLVMTableGen': source_version_major_minor,
         'LLVMTarget': source_version_major_minor,
         'LLVMTransformUtils': source_version_major_minor,
