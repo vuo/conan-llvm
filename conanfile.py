@@ -8,7 +8,7 @@ class LlvmConan(ConanFile):
 
     source_version = '5.0.2'
     source_version_major_minor = '5.0'
-    package_version = '3'
+    package_version = '4'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.2@vuo/stable'
@@ -177,6 +177,10 @@ class LlvmConan(ConanFile):
 
         # https://reviews.llvm.org/D38141
         tools.patch(patch_file='tsan.patch', base_path=self.source_dir)
+
+        # https://b33p.net/kosada/vuo/vuo/-/issues/18112
+        # https://reviews.llvm.org/D47898
+        tools.patch(patch_file='mapping-to-a-source-type.patch', base_path=self.source_dir)
 
         if platform.system() == 'Linux':
             tools.patch(patch_file='linux-offsetof.patch', base_path=self.source_dir)
