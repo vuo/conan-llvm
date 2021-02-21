@@ -8,7 +8,7 @@ class LlvmConan(ConanFile):
 
     source_version = '5.0.2'
     source_version_major_minor = '5.0'
-    package_version = '4'
+    package_version = '5'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.2@vuo/stable'

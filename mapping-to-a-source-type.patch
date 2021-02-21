@@ -1,5 +1,5 @@
---- lib/Linker/IRMover.cpp.orig	2021-02-19 15:00:40.000000000 -0500
-+++ lib/Linker/IRMover.cpp	2021-02-19 15:04:41.000000000 -0500
+--- lib/Linker/IRMover.cpp	2021-02-21 12:57:44.000000000 -0500
++++ lib/Linker/IRMover.cpp	2021-02-21 13:07:05.000000000 -0500
 @@ -235,18 +235,27 @@
    // These are types that LLVM itself will unique.
    bool IsUniqued = !isa<StructType>(Ty) || cast<StructType>(Ty)->isLiteral();
@@ -17,8 +17,10 @@
 +
 +#ifndef NDEBUG
      for (auto &Pair : MappedTypes) {
-       assert(!(Pair.first != Ty && Pair.second == Ty) &&
-              "mapping to a source type");
+-      assert(!(Pair.first != Ty && Pair.second == Ty) &&
+-             "mapping to a source type");
++      if (Pair.first != Ty && Pair.second == Ty)
++        STy->getContext().diagnose(LinkDiagnosticInfo(DS_Warning, "mapping to a source type"));
      }
 -  }
  #endif
