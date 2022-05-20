@@ -8,10 +8,10 @@ class LlvmConan(ConanFile):
 
     source_version = '5.0.2'
     source_version_major_minor = '5.0'
-    package_version = '5'
+    package_version = '6'
     version = '%s-%s' % (source_version, package_version)
 
-    build_requires = 'vuoutils/1.2@vuo/stable'
+    build_requires = 'vuoutils/1.2@vuo+conan+vuoutils/stable'
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://github.com/vuo/conan-llvm'
     license = 'http://releases.llvm.org/%s/LICENSE.TXT' % source_version
@@ -222,6 +222,7 @@ class LlvmConan(ConanFile):
         cmake.definitions['LLVM_ENABLE_FFI'] = 'OFF'
         cmake.definitions['LLVM_ENABLE_PEDANTIC'] = 'ON'
         cmake.definitions['LLVM_ENABLE_PIC'] = 'ON'
+        cmake.definitions['LLVM_ENABLE_RTTI'] = 'ON'
         cmake.definitions['LLVM_ENABLE_THREADS'] = 'ON'
         cmake.definitions['LLVM_ENABLE_TIMESTAMPS'] = 'ON'
         cmake.definitions['LLVM_ENABLE_WARNINGS'] = 'ON'

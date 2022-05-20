@@ -3,7 +3,7 @@ import platform
 
 class LlvmTestConan(ConanFile):
     generators = 'cmake'
-    requires = 'macos-sdk/10.11-0@vuo/stable'
+    requires = 'macos-sdk/10.11-0@vuo+conan+macos-sdk/stable'
 
     def build(self):
         cmake = CMake(self)
