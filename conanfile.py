@@ -157,7 +157,7 @@ class LlvmConan(ConanFile):
 
     def build_requirements(self):
         if platform.system() == 'Darwin':
-            self.build_requires('macos-sdk/11.0-0@vuo/stable')
+            self.build_requires('macos-sdk/11.0-0@vuo+conan+macos-sdk/stable')
 
     def source(self):
         tools.get('https://releases.llvm.org/%s/llvm-%s.src.tar.xz' % (self.source_version, self.source_version),
