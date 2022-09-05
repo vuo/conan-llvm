@@ -1,0 +1,28 @@
+--- lib/Linker/IRMover.cpp	2022-09-03 15:05:46.000000000 -0400
++++ lib/Linker/IRMover.cpp	2022-09-03 15:08:34.000000000 -0400
+@@ -695,14 +695,24 @@
+     ArrayType *DAT = cast<ArrayType>(DGV->getValueType());
+     ArrayType *SAT = cast<ArrayType>(SGV.getValueType());
+     TypeMap.addTypeMapping(DAT->getElementType(), SAT->getElementType());
+   }
+ 
+   for (GlobalValue &SGV : *SrcM)
+-    if (GlobalValue *DGV = getLinkedToGlobal(&SGV))
++    if (GlobalValue *DGV = getLinkedToGlobal(&SGV)) {
++      if (DGV->getType() == SGV.getType()) {
++        // If the types of DGV and SGV are the same, it means that DGV is from
++        // the source module and got added to DstM from a shared metadata.  We
++        // shouldn't map this type to itself in case the type's components get
++        // remapped to a new type from DstM (for instance, during the loop over
++        // SrcM->getIdentifiedStructTypes() below).
++        continue;
++      }
++
+       TypeMap.addTypeMapping(DGV->getType(), SGV.getType());
++    }
+ 
+   for (GlobalValue &SGV : SrcM->aliases())
+     if (GlobalValue *DGV = getLinkedToGlobal(&SGV))
+       TypeMap.addTypeMapping(DGV->getType(), SGV.getType());
+ 
+   // Incorporate types by name, scanning all the types in the source module.

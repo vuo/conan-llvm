@@ -8,7 +8,7 @@ class LlvmConan(ConanFile):
 
     source_version = '5.0.2'
     source_version_major_minor = '5.0'
-    package_version = '6'
+    package_version = '7'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = 'vuoutils/1.2@vuo+conan+vuoutils/stable'
@@ -177,6 +177,10 @@ class LlvmConan(ConanFile):
 
         # https://reviews.llvm.org/D38141
         tools.patch(patch_file='tsan.patch', base_path=self.source_dir)
+
+        # https://github.com/llvm/llvm-project/issues/39659
+        # https://reviews.llvm.org/D66814
+        tools.patch(patch_file='called-function-not-same-type-as-call.patch', base_path=self.source_dir)
 
         # https://b33p.net/kosada/vuo/vuo/-/issues/18112
         # https://reviews.llvm.org/D47898
